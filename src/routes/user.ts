@@ -1,8 +1,12 @@
+// Imports
 import express, { Request, Response, NextFunction } from 'express';
 import asyncHandler from 'express-async-handler';
 import UserController from '../controllers/user';
 
+// Tools
 import Logger from '../tools/logger';
+
+// Middlewares
 import authenticateToken from '../middlewares/authentication';
 
 const userApis = express.Router();
