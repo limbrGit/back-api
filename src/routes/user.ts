@@ -7,34 +7,6 @@ import authenticateToken from '../middlewares/authentication';
 
 const userApis = express.Router();
 
-// Log in
-userApis.post(
-  '/login',
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      Logger.info({ functionName: 'POST on /login' }, req);
-      const result = await UserController.login(req);
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  })
-);
-
-// Refresh token
-userApis.get(
-  '/refreshToken',
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      Logger.info({ functionName: 'POST on /refreshToken' }, req);
-      const result = await UserController.refreshToken(req);
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  })
-);
-
 // Get every users
 userApis.get(
   '/',
@@ -57,7 +29,7 @@ userApis.get(
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
       Logger.info({ functionName: 'GET on /users' }, req);
-      const result = await UserController.getUser(req);
+      const result = await UserController.getUserById(req);
       res.json(result);
     } catch (error) {
       next(error);
@@ -68,7 +40,6 @@ userApis.get(
 // Create user account
 userApis.post(
   '/create',
-  authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
       Logger.info({ functionName: 'POST on /users/create' }, req);

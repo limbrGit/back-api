@@ -8,7 +8,7 @@ import { User } from '../interfaces/user';
 import { MailResetPassword } from '../interfaces/mails';
 
 import Logger from '../tools/logger';
-import { wait } from '../tools/createStrings';
+import { wait } from '../tools/strings';
 
 export const createMailBox = async (user: User, req: Request): Promise<any> => {
   // Set function name for logs

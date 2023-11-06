@@ -33,11 +33,24 @@ export interface Tokens {
   refresh: Token;
 }
 
+export interface MailSender {
+  host: string;
+  port: number;
+  user: string;
+  pass: string;
+}
+
+export interface LimbrLinks {
+  resetPassword: string;
+}
+
 export interface Config {
   port: number;
   delay: number;
   logger: boolean;
   tokens: Tokens;
+  mailSender: MailSender;
   mailServer: MailServer;
   database: Database;
+  limbr: LimbrLinks;
 }

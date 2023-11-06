@@ -1,6 +1,7 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import asyncHandler from 'express-async-handler';
 import cors from 'cors';
 
 import config from './src/configs/config';
@@ -40,10 +41,19 @@ app.use(LoggerInit);
 app.use('/users', userRoutes);
 app.use('/auth', authenticationRoutes);
 
-app.get('/', (req: Request, res: Response) => {
-  Logger.info({ functionName: 'Get on /' }, req);
-  res.status(200).send({ data: 'Server is UP !' });
-});
+// Check Service
+app.get(
+  '/',
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info({ functionName: 'Get on /' }, req);
+      res.status(200).send({ data: 'Server is UP !' });
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 app.get('*', function (req, res) {
   res.status(404).send(CErrors.notFound);
 });

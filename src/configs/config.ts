@@ -11,12 +11,19 @@ const config: Config = {
   tokens: {
     access: {
       secret: process.env.ACCESS_TOKEN_SECRET!,
-      expire: process.env.ACCESS_TOKEN_EXPIRES_IN || "1d",
+      expire: process.env.ACCESS_TOKEN_EXPIRES_IN || '1d',
     },
     refresh: {
       secret: process.env.REFRESH_TOKEN_SECRET!,
-      expire: process.env.REFRESH_TOKEN_EXPIRES_IN || "1d",
-    }
+      expire: process.env.REFRESH_TOKEN_EXPIRES_IN || '1d',
+    },
+  },
+
+  mailSender: {
+    host: process.env.MAIL_SENDER_HOST!,
+    port: parseInt(process.env.MAIL_SENDER_PORT!),
+    user: process.env.MAIL_SENDER_USER!,
+    pass: process.env.MAIL_SENDER_PASS!,
   },
 
   mailServer: {
@@ -36,35 +43,12 @@ const config: Config = {
     password: process.env.DATABASE_PASS!,
     database: process.env.DATABASE_DB!,
     dialect: 'mysql',
-    // pool: {
-    //   max: 5,
-    //   min: 0,
-    //   acquire: 30000,
-    //   idle: 10000,
-    // },
-    // toto: {
-    //   dev: {
-    //     username: 'root',
-    //     password: yourPasswordHere,
-    //     database: 'sequelize_passport',
-    //     host: '127.0.0.1',
-    //     dialect: 'mysql',
-    //   },
-    //   preprod: {
-    //     username: '',
-    //     password: null,
-    //     database: '',
-    //     host: '',
-    //     dialect: 'mysql',
-    //   },
-    //   prod: {
-    //     username: '',
-    //     password: null,
-    //     database: '',
-    //     host: '127.0.0.1',
-    //     dialect: 'mysql',
-    //   },
-    // },
+  },
+
+  limbr: {
+    resetPassword:
+      process.env.LIMBR_RESET_PASSWORD ||
+      'https://front.limbr.fr/resetPassword',
   },
 };
 
