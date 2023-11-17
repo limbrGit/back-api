@@ -50,6 +50,11 @@ const CErrors = {
     message: 'CONFLICT',
     detail: 'Email already exist',
   },
+  UsernameAlreadyExist: {
+    code: 409.2,
+    message: 'CONFLICT',
+    detail: 'Username already exist',
+  },
 
   // 5XX
   processing: {

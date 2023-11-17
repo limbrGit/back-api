@@ -19,7 +19,7 @@ const logger = winston.createLogger({
     new winston.transports.File({
       //path to log file
       filename:
-        '/logs/account-automation_' + dayjs().format('YYYY-MM-DD') + '.log',
+        `/logs/${dayjs().format('YYYY-MM-DD')}_account-automation_server.log`,
       format: winston.format.json(),
       // level: 'debug',
     }),

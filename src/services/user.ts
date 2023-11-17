@@ -20,14 +20,56 @@ import CErrors from '../constants/errors';
 // Services
 import SqlService from './sql';
 
+const columnsGettable = `
+  id,
+  email,
+  username,
+  password,
+  hash,
+  salt,
+  created_at,
+  updated_at,
+  deleted_at,
+  active_date,
+  confirmation_code,
+  subs
+`;
+
 export const getAllUserSQL = async (req: Request): Promise<UserSQL[]> => {
   const functionName = (i: number) => 'services/user.ts : getAllUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = 'SELECT * FROM users';
+  const sql = `
+    SELECT
+      ${columnsGettable}
+    FROM users
+    ;
+  `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
   return result;
+};
+
+export const getUserFromUsernameSQL = async (
+  req: Request,
+  username: string
+): Promise<UserSQL> => {
+  const functionName = (i: number) =>
+    'services/user.ts : getUserFromUsernameSQL ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+    SELECT
+      ${columnsGettable}
+    FROM users
+    WHERE
+      users.username = "${username}"
+    LIMIT 1
+    ;
+  `;
+  const result = await SqlService.sendSqlRequest(req, sql);
+
+  return result[0];
 };
 
 export const getUserFromEmailSQL = async (
@@ -38,7 +80,15 @@ export const getUserFromEmailSQL = async (
     'services/user.ts : getUserFromEmailSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `SELECT * FROM users WHERE users.email = "${email}" LIMIT 1`;
+  const sql = `
+    SELECT
+      ${columnsGettable}
+    FROM users
+    WHERE
+      users.email = "${email}"
+    LIMIT 1
+    ;
+  `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
   return result[0];
@@ -52,7 +102,15 @@ export const getUserFromIdSQL = async (
     'services/user.ts : getUserFromIdSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `SELECT * FROM users WHERE users.id = "${id}" LIMIT 1`;
+  const sql = `
+    SELECT
+      ${columnsGettable}
+    FROM users
+    WHERE
+      users.id = "${id}"
+    LIMIT 1
+    ;
+  `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
   return result[0];
@@ -69,6 +127,7 @@ export const createUserSQL = async (
     INSERT INTO users (
       id,
       email,
+      username,
       password,
       hash,
       salt,
@@ -76,11 +135,13 @@ export const createUserSQL = async (
       updated_at,
       deleted_at,
       active_date,
-      confirmation_code
+      confirmation_code,
+      subs
     )
     VALUES (
       '${userSQL.id}',
       '${userSQL.email}',
+      '${userSQL.username}',
       '${userSQL.password}',
       '${userSQL.hash}',
       '${userSQL.salt}',
@@ -88,7 +149,8 @@ export const createUserSQL = async (
       NOW(),
       NULL,
       NULL,
-      '${userSQL.confirmation_code}'
+      '${userSQL.confirmation_code}',
+      ${userSQL.subs ? "'" + userSQL.subs + "'" : 'NULL'}
     );
   `;
   const insertResult = await SqlService.sendSqlRequest(req, sql);
@@ -161,6 +223,7 @@ export const valideConfirmationCode = async (
 
 export default {
   getAllUserSQL,
+  getUserFromUsernameSQL,
   getUserFromEmailSQL,
   getUserFromIdSQL,
   createUserSQL,

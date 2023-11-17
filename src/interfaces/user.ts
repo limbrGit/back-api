@@ -1,7 +1,22 @@
+export interface Subs {
+  netflix?: boolean;
+  prime?: boolean;
+  disney?: boolean;
+  ocs?: boolean;
+  canal?: boolean;
+  paramount?: boolean;
+  apple?: boolean;
+  bein?: boolean;
+  crunchyroll?: boolean;
+}
+
 export interface User {
   id?: string;
   email: string;
   password?: string;
+  username: string;
+  subs?: Subs;
+  admin?: boolean;
 }
 
 export interface UserToken {
@@ -14,6 +29,7 @@ export interface UserToken {
 export interface UserSQL {
   id: string;
   email: string;
+  username: string;
   password: string;
   hash: string;
   salt: string;
@@ -22,6 +38,7 @@ export interface UserSQL {
   deleted_at: number | null;
   active_date: number | null;
   confirmation_code: string;
+  subs: string | null;
 }
 
 export interface HashPassword {
