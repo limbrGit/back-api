@@ -46,6 +46,7 @@ export interface LimbrLinks {
 
 export interface Config {
   port: number;
+  serverName: string;
   delay: number;
   logger: boolean;
   tokens: Tokens;

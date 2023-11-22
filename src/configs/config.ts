@@ -5,6 +5,7 @@ dotenv.config();
 
 const config: Config = {
   port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
+  serverName: process.env.SERVER_NAME || 'back-api',
   delay: process.env.DELAY ? parseInt(process.env.DELAY) : 100, // 130 in prod
   logger: process.env.LOGGER === 'true',
 

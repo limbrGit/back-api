@@ -1,9 +1,5 @@
 // Imports
 import { Request } from 'express';
-import mysql from 'mysql';
-
-// Configs
-import config from '../configs/config';
 
 // Interfaces
 import { UserSQL } from '../interfaces/user';

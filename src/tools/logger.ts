@@ -5,12 +5,12 @@ import dayjs from 'dayjs';
 
 import config from '../configs/config';
 
-const logger = winston.createLogger({
+const createLogger = () => winston.createLogger({
   level: 'debug',
   format: winston.format.combine(
     winston.format.splat(),
     winston.format.errors({ stack: true }),
-    winston.format.label({ label: path.basename('account-automation') }),
+    winston.format.label({ label: path.basename(config.serverName) }),
     winston.format.timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSS' })
     // Format the metadata object
     // winston.format.metadata({ fillExcept: ['message', 'level', 'timestamp', 'label'] })
@@ -18,8 +18,9 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.File({
       //path to log file
-      filename:
-        `/logs/${dayjs().format('YYYY-MM-DD')}_account-automation_server.log`,
+      filename: `/logs/${dayjs().format('YYYY-MM-DD')}_${
+        config.serverName
+      }_server.log`,
       format: winston.format.json(),
       // level: 'debug',
     }),
@@ -32,20 +33,20 @@ const logger = winston.createLogger({
 
 const info = (data: any, req?: Request) => {
   if (config.logger) {
-    logger.info({ ...data, executionId: req?.headers?.executionId });
+    createLogger().info({ ...data, executionId: req?.headers?.executionId });
   }
 };
 
 const warn = (data: any, req?: Request) => {
-  logger.warn({ ...data, executionId: req?.headers?.executionId });
+  createLogger().warn({ ...data, executionId: req?.headers?.executionId });
 };
 
 const error = (data: any, req?: Request) => {
   if (data instanceof Error) {
     // logger.log({ level: 'error', message: `${data.stack || data}` });
-    logger.error({ data: data.stack, executionId: req?.headers?.executionId });
+    createLogger().error({ data: data.stack, executionId: req?.headers?.executionId });
   } else {
-    logger.error({ ...data, executionId: req?.headers?.executionId });
+    createLogger().error({ ...data, executionId: req?.headers?.executionId });
   }
 };
 

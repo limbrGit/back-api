@@ -29,7 +29,7 @@ const sendSqlRequest = async (req: Request, sql: string): Promise<any> => {
         return reject(error);
       }
       connection.end();
-      Logger.error({ functionName: functionName(1), data: 'SQL OK' }, req);
+      Logger.info({ functionName: functionName(1), data: 'SQL OK' }, req);
       return resolve(results);
     });
   });
