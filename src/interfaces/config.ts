@@ -42,6 +42,7 @@ export interface MailSender {
 
 export interface LimbrLinks {
   resetPassword: string;
+  catalogApi: string;
 }
 
 export interface Config {

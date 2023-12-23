@@ -4,14 +4,14 @@ import crypto from 'crypto';
 // Interfaces
 import { HashPassword } from '../interfaces/user';
 
-export const rdmString = (
-  result: string = '',
-  length: number = 10,
-  majSelect: Boolean = true,
-  minSelect: Boolean = true,
-  numSelect: Boolean = true,
-  speSelect: Boolean = false
-): string => {
+export const rdmString = ({
+  start = '',
+  length = 10,
+  majSelect = true,
+  minSelect = true,
+  numSelect = true,
+  speSelect = false,
+}): string => {
   const maj = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const min = 'abcdefghijklmnopqrstuvwxyz';
   const num = '0123456789';
@@ -20,31 +20,38 @@ export const rdmString = (
 
   if (majSelect) {
     characters += maj;
-    result += maj.charAt(Math.floor(Math.random() * maj.length));
+    start += maj.charAt(Math.floor(Math.random() * maj.length));
   }
   if (minSelect) {
     characters += min;
-    result += min.charAt(Math.floor(Math.random() * min.length));
+    start += min.charAt(Math.floor(Math.random() * min.length));
   }
   if (numSelect) {
     characters += num;
-    result += num.charAt(Math.floor(Math.random() * num.length));
+    start += num.charAt(Math.floor(Math.random() * num.length));
   }
   if (speSelect) {
     characters += spe;
-    result += spe.charAt(Math.floor(Math.random() * spe.length));
+    start += spe.charAt(Math.floor(Math.random() * spe.length));
   }
-  for (let i: number = 0; result.length < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  for (let i: number = 0; start.length < length; i++) {
+    start += characters.charAt(Math.floor(Math.random() * characters.length));
   }
 
-  return result;
+  return start;
 };
 
 export const checkPassword = (password: string): boolean => {
   const regularExpression =
-    /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,20}$/;
+    /^(?=.*([A-Z]){1,})(?=.*[!@#$&*]{1,})(?=.*[0-9]{1,})(?=.*[a-z]{1,}).{8,128}$/;
   return regularExpression.test(password);
+};
+
+export const checkEmail = (email: string): boolean => {
+  const regularExpression = new RegExp(
+    "([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(.[!#-'*+/-9=?A-Z^-~-]+)*|[[\t -Z^-~]*])"
+  );
+  return regularExpression.test(email);
 };
 
 export const hashPassword = (password: string): HashPassword => {
@@ -67,3 +74,13 @@ export const hashPassword = (password: string): HashPassword => {
 
 export const wait = async (sec: number = 1): Promise<void> =>
   new Promise((r) => setTimeout(r, sec * 1000));
+
+export const flatObj = (obj = {}) =>
+  Object.keys(obj || {}).reduce((acc, cur) => {
+    if (typeof obj[cur] === 'object') {
+      acc = { ...acc, ...flatObj(obj[cur]) };
+    } else {
+      acc[cur] = obj[cur];
+    }
+    return acc;
+  }, {});

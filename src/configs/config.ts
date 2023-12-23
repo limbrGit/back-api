@@ -50,6 +50,8 @@ const config: Config = {
     resetPassword:
       process.env.LIMBR_RESET_PASSWORD ||
       'https://front.limbr.fr/resetPassword',
+    catalogApi : process.env.LIMBR_CATALOG_API ||
+    'https://catalog-api.limbr.fr',
   },
 };
 

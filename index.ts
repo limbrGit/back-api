@@ -1,17 +1,26 @@
+// Imports
 import express, { Express, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import asyncHandler from 'express-async-handler';
 import cors from 'cors';
 
+// Config
 import config from './src/configs/config';
+
+// Constants
 import CErrors from './src/constants/errors';
+
+// Middlewares
 import ErrorHandler from './src/middlewares/errorHandler';
 import LoggerInit from './src/middlewares/loggerInit';
 
+// Routes
 import userRoutes from './src/routes/user';
 import authenticationRoutes from './src/routes/authentication';
+import listRoutes from './src/routes/list';
 
+// Tools
 import Logger from './src/tools/logger';
 
 // Start express application
@@ -40,6 +49,7 @@ app.use(LoggerInit);
 // Routes
 app.use('/users', userRoutes);
 app.use('/auth', authenticationRoutes);
+app.use('/list', listRoutes);
 
 // Check Service
 app.get(

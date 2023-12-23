@@ -28,6 +28,13 @@ const columnsGettable = `
   deleted_at,
   active_date,
   confirmation_code,
+  username,
+  firstname,
+  lastname,
+  birthdate,
+  gender,
+  description,
+  picture,
   subs
 `;
 
@@ -159,6 +166,38 @@ export const createUserSQL = async (
   return result;
 };
 
+export const updateUserSQL = async (
+  req: Request,
+  userSQL: UserSQL
+): Promise<UserSQL> => {
+  const functionName = (i: number) => 'services/user.ts : updateUserSQL ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+    UPDATE users
+    SET
+      username = '${userSQL.username}',
+      ${userSQL.firstname ? "firstname = '" + userSQL.firstname + "'," : ''}
+      ${userSQL.lastname ? "lastname = '" + userSQL.lastname + "'," : ''}
+      ${userSQL.birthdate ? "birthdate = '" + userSQL.birthdate + "'," : ''}
+      ${userSQL.gender ? "gender = '" + userSQL.gender + "'," : ''}
+      ${userSQL.description ? "description = '" + userSQL.description + "'," : ''}
+      ${typeof userSQL.picture === "number" ? "picture = " + userSQL.picture + "," : ''}
+      ${userSQL.subs ? "subs = '" + userSQL.subs + "'," : ''}
+      updated_at = NOW()
+    WHERE
+      users.id = '${userSQL.id}'
+  `;
+  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  if (insertResult.affectedRows !== 1) {
+    throw new AppError(CErrors.processing);
+  }
+
+  const result = getUserFromIdSQL(req, userSQL.id);
+
+  return result;
+};
+
 export const changePasswordUserSQL = async (
   req: Request,
   userSQL: UserSQL,
@@ -217,12 +256,45 @@ export const valideConfirmationCode = async (
   return result;
 };
 
+export const deleteUserSQL = async (
+  req: Request,
+  userId: string
+): Promise<UserSQL> => {
+  const functionName = (i: number) =>
+    'services/user.ts : deleteUserSQL ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+  UPDATE users
+  SET
+    firstname = NULL,
+    lastname = NULL,
+    birthdate = NULL,
+    gender = NULL,
+    description = NULL,
+    deleted_at = NOW()
+  WHERE
+    users.id = '${userId}';
+  `;
+  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  if (insertResult.affectedRows !== 1) {
+    throw new AppError(CErrors.processing);
+  }
+
+  const result = getUserFromIdSQL(req, userId);
+
+  return result;
+};
+
+
 export default {
   getAllUserSQL,
   getUserFromUsernameSQL,
   getUserFromEmailSQL,
   getUserFromIdSQL,
   createUserSQL,
+  updateUserSQL,
   changePasswordUserSQL,
   valideConfirmationCode,
+  deleteUserSQL
 };

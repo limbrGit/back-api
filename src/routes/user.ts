@@ -32,7 +32,7 @@ userApis.get(
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
-      Logger.info({ functionName: 'GET on /users' }, req);
+      Logger.info({ functionName: 'GET on /users/:id' }, req);
       const result = await UserController.getUserById(req);
       res.json(result);
     } catch (error) {
@@ -54,5 +54,36 @@ userApis.post(
     }
   })
 );
+
+// Update user account
+userApis.put(
+  '/:id',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info({ functionName: 'PUT on /users/:id' }, req);
+      const result = await UserController.update(req);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+// Delete user account
+userApis.delete(
+  '/:id',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info({ functionName: 'DELETE on /users/:id' }, req);
+      const result = await UserController.deleteUser(req);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 
 export default userApis;

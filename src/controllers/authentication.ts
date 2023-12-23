@@ -31,6 +31,7 @@ import { RessetPassword } from '../interfaces/resetPassword';
 interface JwtUser {
   id: string;
   email: string;
+  username: string;
   iat?: number;
   exp?: number;
 }
@@ -38,6 +39,7 @@ interface JwtUser {
 interface ApiTokens {
   id: string;
   email: string;
+  username: string;
   access: string;
   refresh?: string;
 }
@@ -73,6 +75,9 @@ const login = async (req: Request): Promise<ApiTokens> => {
   if (!user) {
     throw new AppError(CErrors.wrongParameter);
   }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
   Logger.info({ functionName: functionName(2), data: 'Check User' }, req);
 
   // Check password
@@ -87,6 +92,7 @@ const login = async (req: Request): Promise<ApiTokens> => {
   const jwtUser: JwtUser = {
     id: user.id,
     email: user.email,
+    username: user.username,
   };
 
   const access = generateAccessToken(jwtUser);
@@ -95,6 +101,7 @@ const login = async (req: Request): Promise<ApiTokens> => {
   return {
     id: user.id,
     email: user.email,
+    username: user.username,
     access: access,
     refresh: refresh,
   };
@@ -122,8 +129,9 @@ const refreshToken = (req: Request): Promise<ApiTokens> => {
       }
 
       const newAccessToken = generateAccessToken({
-        id: user.id,
-        email: user.email,
+        id: user?.id,
+        email: user?.email,
+        username: user?.username,
       });
       resolve({ access: newAccessToken });
     });
@@ -145,6 +153,9 @@ const sendCode = async (req: Request): Promise<object> => {
   const user = await UserService.getUserFromEmailSQL(req, req.query.email);
   if (!user) {
     throw new AppError(CErrors.wrongParameter);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
   }
   Logger.info(
     { functionName: functionName(2), data: 'Check User', user: user },
@@ -181,6 +192,9 @@ const confirmCode = async (req: Request): Promise<User> => {
   if (!user) {
     throw new AppError(CErrors.wrongParameter);
   }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
   Logger.info({ functionName: functionName(2), data: 'Check User' }, req);
 
   // Check code
@@ -203,6 +217,7 @@ const confirmCode = async (req: Request): Promise<User> => {
   return {
     id: user.id,
     email: user.email,
+    username: user.username,
   };
 };
 
@@ -226,6 +241,9 @@ const forgotPassword = async (req: Request): Promise<object> => {
   if (!user) {
     //! Changer pour renvoyer OK quand même, la réponse doit toujours être OK
     throw new AppError(CErrors.wrongParameter);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
   }
   Logger.info({ functionName: functionName(2), data: 'Check User' }, req);
 
@@ -304,6 +322,9 @@ const resetPassword = async (req: Request): Promise<Object> => {
   );
   if (!user) {
     throw new AppError(CErrors.userNotFound);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
   }
   Logger.info({ functionName: functionName(5), data: 'Check User' }, req);
 
