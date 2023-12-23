@@ -51,7 +51,8 @@ export const getListSQL = async (
 export const getContentInListSQL = async (
   req: Request,
   user: UserSQL | User,
-  content: Content
+  content: Content,
+  returnDeleted: boolean = false
 ): Promise<ListSQL> => {
   const functionName = (i: number) => 'services/list.ts : getListSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
@@ -62,8 +63,8 @@ export const getContentInListSQL = async (
     FROM users_list
     WHERE
       user_email = '${user.email}' AND
-      content_id = ${content.content_id} AND
-      deleted_at IS NULL
+      content_id = ${content.content_id}
+      ${returnDeleted ? '' : 'AND deleted_at IS NULL'}
     LIMIT 1
     ;
   `;
@@ -98,11 +99,14 @@ export const addContentInListSQL = async (
       current_timestamp(),
       NULL
     )
+    ON DUPLICATE KEY
+    UPDATE
+      deleted_at = NULL
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql, []);
-  if (insertResult.affectedRows !== 1) {
+  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  if (insertResult.affectedRows === 0) {
     throw new AppError(CErrors.processing);
   }
 
@@ -135,7 +139,7 @@ export const deleteContentInListSQL = async (
     throw new AppError(CErrors.processing);
   }
 
-  const result = getContentInListSQL(req, user, content);
+  const result = getContentInListSQL(req, user, content, true);
 
   return result;
 };
@@ -144,5 +148,5 @@ export default {
   getListSQL,
   getContentInListSQL,
   addContentInListSQL,
-  deleteContentInListSQL
+  deleteContentInListSQL,
 };
