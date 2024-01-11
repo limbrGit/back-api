@@ -55,6 +55,21 @@ userApis.post(
   })
 );
 
+// Update user password
+userApis.put(
+  '/password',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info({ functionName: 'PUT on /users/password' }, req);
+      const result = await UserController.updatePassword(req);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 // Update user account
 userApis.put(
   '/:id',

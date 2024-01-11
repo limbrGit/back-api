@@ -23,9 +23,7 @@ const columnsGettable = `
   password,
   hash,
   salt,
-  created_at,
-  updated_at,
-  deleted_at,
+  tokens,
   active_date,
   confirmation_code,
   username,
@@ -35,7 +33,10 @@ const columnsGettable = `
   gender,
   description,
   picture,
-  subs
+  subs,
+  created_at,
+  updated_at,
+  deleted_at
 `;
 
 export const getAllUserSQL = async (req: Request): Promise<UserSQL[]> => {
@@ -134,12 +135,13 @@ export const createUserSQL = async (
       password,
       hash,
       salt,
-      created_at,
-      updated_at,
-      deleted_at,
+      tokens,
       active_date,
       confirmation_code,
-      subs
+      subs,
+      created_at,
+      updated_at,
+      deleted_at
     )
     VALUES (
       '${userSQL.id}',
@@ -148,12 +150,13 @@ export const createUserSQL = async (
       '${userSQL.password}',
       '${userSQL.hash}',
       '${userSQL.salt}',
-      NOW(),
-      NOW(),
-      NULL,
+      0,
       NULL,
       '${userSQL.confirmation_code}',
-      ${userSQL.subs ? "'" + userSQL.subs + "'" : 'NULL'}
+      ${userSQL.subs ? "'" + userSQL.subs + "'" : 'NULL'},
+      NOW(),
+      NOW(),
+      NULL
     );
   `;
   const insertResult = await SqlService.sendSqlRequest(req, sql);

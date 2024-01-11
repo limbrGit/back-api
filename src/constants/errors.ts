@@ -55,12 +55,27 @@ const CErrors = {
     message: 'BAD REQUEST',
     detail: 'The picture selected is in error',
   },
+  wrongTypeFormat: {
+    code: 400.12,
+    message: 'BAD REQUEST',
+    detail: 'Wrong type format',
+  },
 
   // 401
   wrongParameter: {
     code: 401.1,
     message: 'UNAUTHORIZED',
     detail: 'Wrong parameter',
+  },
+  wrongPassword: {
+    code: 401.2,
+    message: 'UNAUTHORIZED',
+    detail: 'Wrong password',
+  },
+  samePassword: {
+    code: 401.3,
+    message: 'UNAUTHORIZED',
+    detail: 'Same password',
   },
 
   // 403
@@ -89,6 +104,11 @@ const CErrors = {
     message: 'FORBIDDEN',
     detail: 'User deleted',
   },
+  offerDeleted: {
+    code: 403.6,
+    message: 'FORBIDDEN',
+    detail: 'Offer deleted',
+  },
 
   // 404
   notFound: {
@@ -110,6 +130,11 @@ const CErrors = {
     code: 404.4,
     message: 'CONFLICT',
     detail: 'Content not in list',
+  },
+  offerNotFound: {
+    code: 404.2,
+    message: 'NOT FOUND',
+    detail: 'Offer not found',
   },
   EmailAlreadyExist: {
     code: 409.1,
@@ -137,6 +162,11 @@ const CErrors = {
     code: 500.2,
     message: 'PROCESSING ERROR',
     detail: 'Processing error for create canal account : Href not found',
+  },
+  vivawalletPaymentOrder: {
+    code: 500.3,
+    message: 'PROCESSING ERROR',
+    detail: 'Error to create payment order',
   },
 };
 

@@ -158,6 +158,74 @@ const create = async (req: Request): Promise<User> => {
   return { id: result.id, email: result.email, username: result.username };
 };
 
+const updatePassword = async (req: Request): Promise<User> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'controller/user.ts : updatePassword ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  // Check params
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    throw new AppError(CErrors.missingParameter);
+  }
+  if (oldPassword === newPassword) {
+    throw new AppError(CErrors.samePassword);
+  }
+
+  // Check User
+  const user: UserSQL = await UserService.getUserFromIdSQL(req, req.user.id);
+  if (!user) {
+    throw new AppError(CErrors.userNotFound);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+  Logger.info({ functionName: functionName(1), data: 'Check User' }, req);
+
+  // Check old password
+  const oldHash = crypto
+    .pbkdf2Sync(req.body.oldPassword, user.salt, 1000, 64, 'sha512')
+    .toString('hex');
+  if (oldHash !== user.hash) {
+    throw new AppError(CErrors.wrongPassword);
+  }
+
+  // Check new password
+  if (!checkPassword(newPassword)) {
+    throw new AppError(CErrors.passwordNotStrong);
+  }
+  Logger.info({ functionName: functionName(2), data: 'Check passwords' }, req);
+
+  // Update user password
+  const { salt, hash } = hashPassword(newPassword);
+  const userUpdated: UserSQL = await UserService.changePasswordUserSQL(
+    req,
+    user,
+    newPassword,
+    salt,
+    hash
+  );
+  Logger.info(
+    { functionName: functionName(2), data: 'Update user password' },
+    req
+  );
+
+  // Send mail
+  await SendMails.sendResetPasswordMail(req, user);
+
+  return {
+    ...userUpdated,
+    password: undefined,
+    hash: undefined,
+    salt: undefined,
+    confirmation_code: undefined,
+    subs: userUpdated.subs
+      ? flatObj({ ...userUpdated.subs.split(',').map((e) => ({ [e]: true })) })
+      : null,
+  };
+};
+
 const update = async (req: Request): Promise<User> => {
   // Set function name for logs
   const functionName = (i: number) => 'controller/user.ts : update ' + i;
@@ -296,6 +364,7 @@ export default {
   getAll,
   getUserById,
   create,
+  updatePassword,
   update,
   deleteUser,
 };

@@ -45,6 +45,23 @@ export interface LimbrLinks {
   catalogApi: string;
 }
 
+export interface CipherKeys {
+  algorithm: string;
+  netflix: string;
+  disney: string;
+  canal: string;
+  paramount: string;
+  ocs: string;
+  crunchyroll: string;
+}
+
+export interface Vivawallet {
+  siteCode: string;
+  paymentUrl: string;
+  accountUrl: string;
+  basicAuth: string;
+}
+
 export interface Config {
   port: number;
   serverName: string;
@@ -55,4 +72,6 @@ export interface Config {
   mailServer: MailServer;
   database: Database;
   limbr: LimbrLinks;
+  cipher: CipherKeys;
+  vivawallet: Vivawallet;
 }

@@ -50,8 +50,24 @@ const config: Config = {
     resetPassword:
       process.env.LIMBR_RESET_PASSWORD ||
       'https://front.limbr.fr/resetPassword',
-    catalogApi : process.env.LIMBR_CATALOG_API ||
-    'https://catalog-api.limbr.fr',
+    catalogApi: process.env.LIMBR_CATALOG_API || 'https://catalog-api.limbr.fr',
+  },
+
+  cipher: {
+    algorithm: process.env.CIPHER_ALGORITHM || 'aes-256-cbc',
+    netflix: process.env.CIPHER_NETFLIX!,
+    disney: process.env.CIPHER_DISNEY!,
+    canal: process.env.CIPHER_CANAL!,
+    paramount: process.env.CIPHER_PARAMOUNT!,
+    ocs: process.env.CIPHER_OCS!,
+    crunchyroll: process.env.CIPHER_CRUNCHYROLL!,
+  },
+
+  vivawallet: {
+    siteCode: process.env.VIVAWALLET_SITE_CODE || '6271',
+    paymentUrl: process.env.VIVAWALLET_PAYMENT_URL || 'demo-api.vivapayments.com',
+    accountUrl: process.env.VIVAWALLET_ACCOUNT_URL || 'demo-accounts.vivapayments.com',
+    basicAuth: process.env.VIVAWALLET_BASIC_AUTH!
   },
 };
 

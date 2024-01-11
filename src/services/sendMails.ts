@@ -73,7 +73,7 @@ export const sendCodeMail = async (
           <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
             <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px  #e0e0e0;">
               <header style="margin-bottom: 40px; display: flex; justify-content: center; margin-top: 20px">
-                <img style="width: 150px" src="https://front.limbr.fr/static/media/Turquoisebg_off.7589049b07499f45612e5214f1276798.svg" alt="Limbr Logo" />
+                <img style="width: 150px" src="https://limbr.fr/Logo/Turquoisebg_off.svg" alt="Limbr Logo" />
               </header>
               <section style="color: #333;">
                 <p>Bienvenue chez <strong>Limbr</strong> !</p>
@@ -95,8 +95,8 @@ export const sendCodeMail = async (
               );">              
                 <p>
                 Tu peux supprimer ton compte Limbr à tout moment depuis les paramètres de ton compte.
-                <br>Consulte les <a href="https://front.limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-                <br>Consulte notre <a href="https://front.limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
+                <br>Consulte les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+                <br>Consulte notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
                 </p>
                 <p>
                 Cet e-mail a été envoyé à ${user.email}. 
@@ -142,7 +142,7 @@ export const sendForgotPasswordMail = async (
           <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
             <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px  #e0e0e0;">
               <header style="margin-bottom: 40px; display: flex; justify-content: center; margin-top: 20px">
-                <img style="width: 150px" src="https://front.limbr.fr/static/media/Turquoisebg_off.7589049b07499f45612e5214f1276798.svg" alt="Limbr Logo" />
+                <img style="width: 150px" src="https://limbr.fr/Logo/Turquoisebg_off.svg" alt="Limbr Logo" />
               </header>
               <section style="color: #333;">
                 <p>Bonjour, </p>
@@ -166,8 +166,8 @@ export const sendForgotPasswordMail = async (
                 #2ad0ca 100%
               );">              
                 <p>
-                Consulte les <a href="https://front.limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-                <br>Consulte notre <a href="https://front.limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
+                Consulte les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+                <br>Consulte notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
                 </p>
                 <p>
                 Cet e-mail a été envoyé à ${user.email}. 
@@ -211,7 +211,7 @@ export const sendResetPasswordMail = async (
     <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
     <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px  #e0e0e0;">
         <header style="margin-bottom: 40px; display: flex; justify-content: center; margin-top: 20px">
-          <img style="width: 150px" src="https://front.limbr.fr/static/media/Turquoisebg_off.7589049b07499f45612e5214f1276798.svg" alt="Limbr Logo" />
+          <img style="width: 150px" src="https://limbr.fr/Logo/Turquoisebg_off.svg" alt="Limbr Logo" />
         </header>
         <section style="color: #333;">
           <p>Bonjour, </p>
@@ -231,8 +231,8 @@ export const sendResetPasswordMail = async (
           #2ad0ca 100%
         );">              
           <p>
-          Consulte les <a href="https://front.limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-          <br>Consulte notre <a href="https://front.limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
+          Consulte les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+          <br>Consulte notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
           </p>
           <p>
           Cet e-mail a été envoyé à ${user.email}. 

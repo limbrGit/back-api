@@ -82,6 +82,7 @@ const gettableCatalogLinks = [
   // 'episode_id',
   'platform',
   'link',
+  'available'
 ];
 
 const gettableCatalogEpisodes = [
@@ -188,6 +189,7 @@ export const getLinksFromId = async (
     FROM catalog_links
     WHERE
       catalog_links.${selectionner}_id = ?
+      AND catalog_links.available = TRUE
     ;
   `;
   const links: Link[] = await SqlService.sendSqlRequest(req, sql, [id]);

@@ -15,6 +15,7 @@ export interface User {
   email: string;
   password?: string;
   username: string;
+  tokens: number;
   firstname?: string | null;
   lastname?: string | null;
   birthdate?: string | null;
@@ -39,9 +40,7 @@ export interface UserSQL {
   password: string;
   hash: string;
   salt: string;
-  created_at: number;
-  updated_at: number;
-  deleted_at: number | null;
+  tokens: number;
   active_date: number | null;
   confirmation_code: string;
   firstname?: string | null;
@@ -51,6 +50,9 @@ export interface UserSQL {
   description?: string | null;
   picture?: string | null;
   subs: string | null;
+  created_at: number;
+  updated_at: number;
+  deleted_at: number | null;
 }
 
 export interface HashPassword {
@@ -60,7 +62,7 @@ export interface HashPassword {
 
 export enum Gender {
   Male = 'male',
-  Female = 'Female',
+  Female = 'female',
   Other = 'other',
 }
 

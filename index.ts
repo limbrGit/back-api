@@ -19,6 +19,8 @@ import LoggerInit from './src/middlewares/loggerInit';
 import userRoutes from './src/routes/user';
 import authenticationRoutes from './src/routes/authentication';
 import listRoutes from './src/routes/list';
+import watchRoutes from './src/routes/watch';
+import paymentRoutes from './src/routes/payment';
 
 // Tools
 import Logger from './src/tools/logger';
@@ -50,6 +52,8 @@ app.use(LoggerInit);
 app.use('/users', userRoutes);
 app.use('/auth', authenticationRoutes);
 app.use('/list', listRoutes);
+app.use('/watch', watchRoutes);
+app.use('/payment', paymentRoutes);
 
 // Check Service
 app.get(
