@@ -60,6 +60,26 @@ const CErrors = {
     message: 'BAD REQUEST',
     detail: 'Wrong type format',
   },
+  transactionOver: {
+    code: 400.13,
+    message: 'BAD REQUEST',
+    detail: 'Transaction Over',
+  },
+  noCurrentToken: {
+    code: 400.14,
+    message: 'BAD REQUEST',
+    detail: 'You have no current token',
+  },
+  currentTokenAlreadyUsed: {
+    code: 400.14,
+    message: 'BAD REQUEST',
+    detail: 'You have current token available',
+  },
+  missingBearerToken: {
+    code: 400.15,
+    message: 'BAD REQUEST',
+    detail: 'Missing bearer token',
+  },
 
   // 401
   wrongParameter: {
@@ -76,6 +96,11 @@ const CErrors = {
     code: 401.3,
     message: 'UNAUTHORIZED',
     detail: 'Same password',
+  },
+  wrongBearerToken: {
+    code: 401.4,
+    message: 'UNAUTHORIZED',
+    detail: 'Wrong bearer token',
   },
 
   // 403
@@ -109,6 +134,11 @@ const CErrors = {
     message: 'FORBIDDEN',
     detail: 'Offer deleted',
   },
+  userNotActive: {
+    code: 403.7,
+    message: 'FORBIDDEN',
+    detail: 'User not active',
+  },
 
   // 404
   notFound: {
@@ -135,6 +165,11 @@ const CErrors = {
     code: 404.2,
     message: 'NOT FOUND',
     detail: 'Offer not found',
+  },
+  transactionNotFound: {
+    code: 404.3,
+    message: 'NOT FOUND',
+    detail: 'Transaction not found',
   },
   EmailAlreadyExist: {
     code: 409.1,
@@ -163,10 +198,20 @@ const CErrors = {
     message: 'PROCESSING ERROR',
     detail: 'Processing error for create canal account : Href not found',
   },
-  vivawalletPaymentOrder: {
+  vivawalletCreatePaymentOrder: {
     code: 500.3,
     message: 'PROCESSING ERROR',
     detail: 'Error to create payment order',
+  },
+  vivawalletGetPaymentOrder: {
+    code: 500.4,
+    message: 'PROCESSING ERROR',
+    detail: 'Error to get payment order',
+  },
+  getUser: {
+    code: 500.5,
+    message: 'PROCESSING ERROR',
+    detail: 'Error to get user',
   },
 };
 

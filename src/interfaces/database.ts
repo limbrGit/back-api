@@ -12,6 +12,8 @@ export interface PlatformAccountSQL {
   created_at: number;
   updated_at: number;
   deleted_at: number | null;
+  users?: number;
+  users_per_account?: number;
 }
 
 export interface PlatformInfoSQL {

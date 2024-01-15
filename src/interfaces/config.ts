@@ -43,6 +43,7 @@ export interface MailSender {
 export interface LimbrLinks {
   resetPassword: string;
   catalogApi: string;
+  accountApi: string;
 }
 
 export interface CipherKeys {
@@ -59,7 +60,9 @@ export interface Vivawallet {
   siteCode: string;
   paymentUrl: string;
   accountUrl: string;
-  basicAuth: string;
+  orderUrl: string;
+  orderBasicAuth: string;
+  loginBasicAuth: string;
 }
 
 export interface Config {

@@ -21,6 +21,7 @@ import authenticationRoutes from './src/routes/authentication';
 import listRoutes from './src/routes/list';
 import watchRoutes from './src/routes/watch';
 import paymentRoutes from './src/routes/payment';
+import tokenRoutes from './src/routes/token';
 
 // Tools
 import Logger from './src/tools/logger';
@@ -54,6 +55,7 @@ app.use('/auth', authenticationRoutes);
 app.use('/list', listRoutes);
 app.use('/watch', watchRoutes);
 app.use('/payment', paymentRoutes);
+app.use('/token', tokenRoutes);
 
 // Check Service
 app.get(

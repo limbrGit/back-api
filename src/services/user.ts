@@ -24,6 +24,7 @@ const columnsGettable = `
   hash,
   salt,
   tokens,
+  token_end_date,
   active_date,
   confirmation_code,
   username,
@@ -180,6 +181,8 @@ export const updateUserSQL = async (
     UPDATE users
     SET
       username = '${userSQL.username}',
+      ${userSQL.tokens ? "tokens = " + userSQL.tokens + "," : ''}
+      ${userSQL.token_end_date ? "token_end_date = '" + userSQL.token_end_date + "'," : ''}
       ${userSQL.firstname ? "firstname = '" + userSQL.firstname + "'," : ''}
       ${userSQL.lastname ? "lastname = '" + userSQL.lastname + "'," : ''}
       ${userSQL.birthdate ? "birthdate = '" + userSQL.birthdate + "'," : ''}

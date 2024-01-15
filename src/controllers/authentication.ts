@@ -78,6 +78,9 @@ const login = async (req: Request): Promise<ApiTokens> => {
   if (user.deleted_at) {
     throw new AppError(CErrors.userDeleted);
   }
+  if (!user.active_date) {
+    throw new AppError(CErrors.userNotActive);
+  }
   Logger.info({ functionName: functionName(2), data: 'Check User' }, req);
 
   // Check password

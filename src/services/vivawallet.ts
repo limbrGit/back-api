@@ -9,7 +9,11 @@ import config from '../configs/config';
 import { UserSQL, User } from '../interfaces/user';
 import { PaymentOfferSQL } from '../interfaces/paymentOffer';
 import { PaymentTransactionSQL } from '../interfaces/paymentTransaction';
-import { VivaAccessToken, VivaPaymentOrder } from '../interfaces/vivawallet';
+import {
+  VivaAccessToken,
+  VivaPaymentOrder,
+  VivaPaymentOrderCreation,
+} from '../interfaces/vivawallet';
 
 // Tools
 import Logger from '../tools/logger';
@@ -35,7 +39,7 @@ const getAccessToken = async (req: Request): Promise<VivaAccessToken> => {
 
   Logger.info({ functionName: functionName(1), body }, req);
 
-  // Create email in the mail server
+  // Get bearer token
   const response = await fetch(
     'https://' + config.vivawallet.accountUrl + '/connect/token',
     {
@@ -43,7 +47,7 @@ const getAccessToken = async (req: Request): Promise<VivaAccessToken> => {
       body: body,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: 'Basic ' + config.vivawallet.basicAuth,
+        Authorization: 'Basic ' + config.vivawallet.loginBasicAuth,
       },
     }
   );
@@ -61,7 +65,7 @@ export const createPaymentOrder = async (
   user: UserSQL | User,
   offer: PaymentOfferSQL,
   transaction: PaymentTransactionSQL
-): Promise<VivaPaymentOrder> => {
+): Promise<VivaPaymentOrderCreation> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'services/vivawallet.ts : createPaymentOrder ' + i;
@@ -85,7 +89,7 @@ export const createPaymentOrder = async (
     allowRecurring: false,
     maxInstallments: 0,
     forceMaxInstallments: false,
-    paymentNotification: true,
+    paymentNotification: false, // Notification par email
     tipAmount: 0,
     disableExactAmount: false,
     disableCash: false,
@@ -98,7 +102,7 @@ export const createPaymentOrder = async (
 
   Logger.info({ functionName: functionName(1), body }, req);
 
-  // Create email in the mail server
+  // Create payment order in vivawallet
   const response = await fetch(
     'https://' + config.vivawallet.paymentUrl + '/checkout/v2/orders',
     {
@@ -107,6 +111,35 @@ export const createPaymentOrder = async (
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + accessToken.access_token,
+      },
+    }
+  );
+
+  // Get the result
+  const data: VivaPaymentOrderCreation = await response.json();
+
+  Logger.info({ functionName: functionName(2), data: data }, req);
+
+  return data;
+};
+
+export const getPaymentOrderFromOrderCode = async (
+  req: Request,
+  transaction: PaymentTransactionSQL
+): Promise<VivaPaymentOrder> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'services/vivawallet.ts : getPaymentOrderFromOrderCode ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  // Create email in the mail server
+  const response = await fetch(
+    `https://${config.vivawallet.orderUrl}/api/orders/${transaction.vivawallet_order_code}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + config.vivawallet.orderBasicAuth,
       },
     }
   );
@@ -121,4 +154,5 @@ export const createPaymentOrder = async (
 
 export default {
   createPaymentOrder,
+  getPaymentOrderFromOrderCode,
 };

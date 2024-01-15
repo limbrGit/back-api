@@ -1,14 +1,14 @@
 // Imports
 import { Request } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import fetch from 'node-fetch';
 
 // Config
 import config from '../configs/config';
 
 // Interfaces
 import { User } from '../interfaces/user';
-import { PlatformAccountSQL } from '../interfaces/database';
+import { PlatformAccountSQL, PlatformInfoSQL } from '../interfaces/database';
 
 // Tools
 import { rdmString } from '../tools/strings';
@@ -149,73 +149,32 @@ export const getPlatformAccountPassword = (
 
 export const createPlatformAccount = async (
   req: Request,
-  user: User,
-  platform: string,
-  date_start: string | null = null,
-  date_end: string | null = null,
-  active: boolean = false,
-  subscribed: boolean = false
+  platformInfo: PlatformInfoSQL
 ): Promise<PlatformAccountSQL> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'services/database.ts : createPlatformAccount ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
-  const id = uuidv4();
-  const iv = rdmString({
-    length: 16,
-    speSelect: true,
-  });
-  const cipher = crypto.createCipheriv(
-    config.cipher.algorithm,
-    Buffer.from(config.cipher[platform]),
-    Buffer.from(iv)
+  // Create account
+  const response = await fetch(
+    `${config.limbr.accountApi}/${platformInfo.name}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + config.vivawallet.loginBasicAuth,
+      },
+    }
   );
-  const cipherPhrase = Buffer.concat([
-    cipher.update(user.password),
-    cipher.final(),
-  ]).toString('hex');
 
-  const sql = `
-    INSERT INTO platform_accounts (
-      id,
-      email,
-      password,
-      iv,
-      cipher,
-      platform,
-      date_start,
-      date_end,
-      active,
-      subscribed,
-      created_at,
-      updated_at,
-      deleted_at
-    )
-    VALUES (
-      '${id}',
-      '${user.email}',
-      '${user.password}',
-      '${iv}',
-      '${cipherPhrase}',
-      '${platform}',
-      ${date_start ? "'" + date_start + "'" : 'NULL'},
-      ${date_end ? "'" + date_end + "'" : 'NULL'},
-      ${active ? 'TRUE' : 'FALSE'},
-      ${subscribed ? 'TRUE' : 'FALSE'},
-      current_timestamp(),
-      current_timestamp(),
-      NULL
-    );
-  `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
-  if (insertResult.affectedRows !== 1) {
-    throw new AppError(CErrors.processing);
-  }
+  // Get the result
+  const data: { email: string } = await response.json();
+  Logger.info({ functionName: functionName(2), data: data }, req);
 
-  const result = getPlatformAccountFromId(req, id);
+  // Get Platform Account
+  const platformAccount = await getPlatformAccountFromEmail(req, data.email);
 
-  return result;
+  return platformAccount;
 };
 
 export const updatePlatformAccountPassword = async (
@@ -340,15 +299,17 @@ export const getPlatformAccountsAvailable = async (
       platform_accounts.active = 1
       AND (
         users_platforms.end_date IS NULL || users_platforms.end_date > CURRENT_TIMESTAMP()
-      ) AND
-      users_platforms.deleted_at IS NULL AND
-      platform_accounts.platform IN (${platforms
+      )
+      AND users_platforms.deleted_at IS NULL
+      AND platform_accounts.platform IN (${platforms
         .map((e) => "'" + e + "'")
         .join(',')})
     GROUP BY
       platform_accounts.email
     HAVING
       users < platform_info.users_per_account
+    ORDER BY
+      users DESC
     ;
   `;
   Logger.info({ functionName: functionName(1), sql: sql }, req);

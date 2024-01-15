@@ -83,6 +83,34 @@ export const getPaymentTransactionFromIdSQL = async (
   return result[0];
 };
 
+export const getPaymentTransactionFromVivawalletOrderCodeSQL = async (
+  req: Request,
+  vivawalletOrderCode: string
+): Promise<PaymentTransactionSQL> => {
+  const functionName = (i: number) =>
+    'services/paymentTransaction.ts : getPaymentTransactionFromVivawalletOrderCodeSQL ' +
+    i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+    SELECT
+      ${columnsGettable}
+    FROM payment_transactions
+    WHERE
+      vivawallet_order_code = ? AND
+      deleted_at IS NULL
+    LIMIT 1
+    ;
+  `;
+  const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [vivawalletOrderCode]
+  );
+
+  return result[0];
+};
+
 export const createPaymentTransactionSQL = async (
   req: Request,
   user: UserSQL | User,
@@ -159,6 +187,7 @@ export const updatePaymentTransactionSQL = async (
 export default {
   getAllPaymentTransactionFromUserSQL,
   getPaymentTransactionFromIdSQL,
+  getPaymentTransactionFromVivawalletOrderCodeSQL,
   createPaymentTransactionSQL,
   updatePaymentTransactionSQL,
 };

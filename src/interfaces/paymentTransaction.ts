@@ -2,10 +2,12 @@
 import { PaymentOfferName } from './paymentOffer';
 
 export enum PaymentTransactionStatus {
+  Error = 'Error',
   Start = 'start',
   Waiting = 'waiting',
   Paid = 'paid',
   Expired = 'expired',
+  Canceled = 'canceled',
 }
 
 export interface PaymentTransaction {

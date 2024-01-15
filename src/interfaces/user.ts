@@ -16,6 +16,7 @@ export interface User {
   password?: string;
   username: string;
   tokens: number;
+  token_end_date: number | string | null;
   firstname?: string | null;
   lastname?: string | null;
   birthdate?: string | null;
@@ -33,23 +34,24 @@ export interface UserToken {
   id: string;
 }
 
-export interface UserSQL {
-  id: string;
-  email: string;
-  username: string;
-  password: string;
+export interface UserSQL extends User {
+  // id: string;
+  // email: string;
+  // username: string;
+  // password: string;
   hash: string;
   salt: string;
-  tokens: number;
+  // tokens: number;
+  // token_valid: number;
   active_date: number | null;
   confirmation_code: string;
-  firstname?: string | null;
-  lastname?: string | null;
-  birthdate?: string | null;
-  gender?: string | null;
-  description?: string | null;
-  picture?: string | null;
-  subs: string | null;
+  // firstname?: string | null;
+  // lastname?: string | null;
+  // birthdate?: string | null;
+  // gender?: string | null;
+  // description?: string | null;
+  // picture?: string | null;
+  // subs: string | null;
   created_at: number;
   updated_at: number;
   deleted_at: number | null;

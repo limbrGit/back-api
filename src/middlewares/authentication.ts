@@ -16,7 +16,7 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 
   // Find token
   const token = req.headers['authorization']?.split(' ')[1];
-  if (token == null) throw new AppError(CErrors.wrongParameter);
+  if (token == null) throw new AppError(CErrors.missingBearerToken);
   Logger.info(
     {
       functionName: functionName(1),
@@ -29,7 +29,7 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 
   jwt.verify(token, config.tokens.access.secret, (err, user) => {
     if (err) {
-      throw new AppError(CErrors.wrongParameter);
+      throw new AppError(CErrors.wrongBearerToken);
     }
     req.user = user;
     next();

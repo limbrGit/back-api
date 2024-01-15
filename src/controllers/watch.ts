@@ -1,9 +1,10 @@
 // Imports
 import { Request } from 'express';
+import dayjs from 'dayjs';
 
 // Interfaces
 import { Link } from '../interfaces/content';
-import { PlatformInfoSQL } from '../interfaces/database';
+import { PlatformAccountSQL, PlatformInfoSQL } from '../interfaces/database';
 
 // Tools
 import Logger from '../tools/logger';
@@ -19,8 +20,11 @@ import UserService from '../services/user';
 import PlatformInfoService from '../services/platformInfo';
 import PlatformAccountService from '../services/platformAccount';
 import ContentService from '../services/content';
+import UserPlatformService from '../services/userPlatforms';
 
-const startWatchContent = async (req: Request): Promise<Link> => {
+const startWatchContent = async (
+  req: Request
+): Promise<{ link: Link; platformAccount: PlatformAccountSQL }> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'controller/list.ts : startWatchContent ' + i;
@@ -45,6 +49,11 @@ const startWatchContent = async (req: Request): Promise<Link> => {
     throw new AppError(CErrors.userDeleted);
   }
 
+  // Check if user have a current token
+  if (!user.token_end_date || (user.token_end_date as number) < Date.now()) {
+    throw new AppError(CErrors.noCurrentToken);
+  }
+
   // Get content or episode
   const content =
     type === 'content'
@@ -65,35 +74,116 @@ const startWatchContent = async (req: Request): Promise<Link> => {
     );
     platformInfos.push({
       ...platformInfo,
-      price: parseFloat(platformInfo.price),
+      price: parseFloat(platformInfo.price as string),
     });
   }
 
-  // Use free days platform
-  const platformFree = platformInfos.find(
-    (platformInfo) => platformInfo.free_days > 0
+  // Get user platforms
+  const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
+    req,
+    user
   );
-  if (platformFree) {
-    // TODO
+
+  // Check if there is no user platform available for this content
+  const platformAlreadyUsed = userPlatforms.find(
+    (e) => e.platform && platformInfos.map((e) => e.name).includes(e.platform)
+  );
+
+  //! If the user already have a platform account used with this content
+  if (platformAlreadyUsed) {
+    // Get platform account
+    const platformAccount =
+      await PlatformAccountService.getPlatformAccountFromEmail(
+        req,
+        platformAlreadyUsed?.platform_account_email!
+      );
+
+    // Return link and platform
+    return {
+      platformAccount: platformAccount,
+      link: element.links.find(
+        (link) =>
+          link.available && link.platform === platformAlreadyUsed?.platform
+      )!,
+    };
   }
 
-  // Find the cheapest platform
-  const platformCheapest = platformInfos.reduce((prev, curr) =>
-    prev.price / prev.users_per_account < curr.price / curr.users_per_account
-      ? prev
-      : curr
-  );
-
-  // Return temporary just to send the link
-  return element.links.find(
-    (link) => link.available && link.platform === platformCheapest.name
-  );
+  //! The user need a new platform account
 
   // Find the cheapest available platform
   const platformAccountsAvailables =
-    await PlatformAccountService.getPlatformAccountsAvailable(req, [
-      platformCheapest.name,
-    ]);
+    await PlatformAccountService.getPlatformAccountsAvailable(
+      req,
+      platformInfos.map((e) => e.name)
+    );
+
+  //! Find the platform with the less place
+  if (platformAccountsAvailables.length > 0) {
+    // In the availables, get the account platforms almost full and the cheapest
+    const platformAccountAlmostFullAndCheapest = platformAccountsAvailables
+      .sort((a, b) => {
+        const userLeftA = a.users_per_account! - a.users!;
+        const userLeftB = b.users_per_account! - b.users!;
+        return userLeftA - userLeftB;
+      })
+      .filter((e, _i, arr) => e.users_per_account === arr[0].users_per_account)
+      .sort((a, b) => {
+        const platformInfo = (p: PlatformAccountSQL) =>
+          platformInfos.find((e) => e.name === p.platform);
+
+        const pricePlatformA =
+          (platformInfo(a)?.price as number) /
+          platformInfo(a)?.users_per_account!;
+        const pricePlatformB =
+          (platformInfo(b)?.price as number) /
+          platformInfo(b)?.users_per_account!;
+
+        return pricePlatformA - pricePlatformB;
+      });
+
+    // Save user platform
+    await UserPlatformService.createUserPlatformsSQL(
+      req,
+      user,
+      platformAccountAlmostFullAndCheapest[0],
+      dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss')
+    );
+
+    // Return link and platform
+    return {
+      platformAccount: platformAccountAlmostFullAndCheapest[0],
+      link: element.links.find(
+        (link) =>
+          link.available &&
+          link.platform === platformAccountAlmostFullAndCheapest[0].platform
+      )!,
+    };
+  }
+
+  //! There is no platform account available we need to create a new one
+
+  // Get platform with free days or the cheapest
+  const platformCheapest =
+    platformInfos.find((platformInfo) => platformInfo.free_days > 0) ||
+    platformInfos.reduce((prev, curr) =>
+      (prev.price as number) / (prev.users_per_account as number) <
+      (curr.price as number) / (curr.users_per_account as number)
+        ? prev
+        : curr
+    );
+
+  // Create an account and use it
+  const newPlatformAccount = await PlatformAccountService.createPlatformAccount(
+    req,
+    platformCheapest
+  );
+
+  return {
+    platformAccount: newPlatformAccount,
+    link: element.links.find(
+      (link) => link.platform === newPlatformAccount.platform
+    )!,
+  };
 };
 
 export default {

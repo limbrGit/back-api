@@ -5,6 +5,20 @@ export interface VivaAccessToken {
   scope: string;
 }
 
-export interface VivaPaymentOrder {
+export interface VivaPaymentOrderCreation {
   orderCode: number;
+}
+
+export interface VivaPaymentOrder {
+  OrderCode: number;
+  SourceCode: string;
+  Tags: string[];
+  TipAmount: number;
+  RequestLang: string;
+  MerchantTrns: string;
+  CustomerTrns: string;
+  MaxInstallments: number;
+  RequestAmount: number;
+  ExpirationDate: string;
+  StateId: number;
 }

@@ -13,6 +13,24 @@ import PaymentController from '../controllers/payment';
 
 const paymentApis = express.Router();
 
+// Check payment
+paymentApis.get(
+  '/check/:vivawalletOfferCode',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info(
+        { functionName: 'GET on /payment/check/:vivawalletOfferCode' },
+        req
+      );
+      const result = await PaymentController.checkPayment(req);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 // Start a payment
 paymentApis.post(
   '/:paymentOfferName',

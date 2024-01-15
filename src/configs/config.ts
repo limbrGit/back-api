@@ -51,6 +51,7 @@ const config: Config = {
       process.env.LIMBR_RESET_PASSWORD ||
       'https://front.limbr.fr/resetPassword',
     catalogApi: process.env.LIMBR_CATALOG_API || 'https://catalog-api.limbr.fr',
+    accountApi: process.env.LIMBR_ACCOUNT_API || 'https://account-api.limbr.fr',
   },
 
   cipher: {
@@ -65,9 +66,13 @@ const config: Config = {
 
   vivawallet: {
     siteCode: process.env.VIVAWALLET_SITE_CODE || '6271',
-    paymentUrl: process.env.VIVAWALLET_PAYMENT_URL || 'demo-api.vivapayments.com',
-    accountUrl: process.env.VIVAWALLET_ACCOUNT_URL || 'demo-accounts.vivapayments.com',
-    basicAuth: process.env.VIVAWALLET_BASIC_AUTH!
+    paymentUrl:
+      process.env.VIVAWALLET_PAYMENT_URL || 'demo-api.vivapayments.com',
+    accountUrl:
+      process.env.VIVAWALLET_ACCOUNT_URL || 'demo-accounts.vivapayments.com',
+    orderUrl: process.env.VIVAWALLET_ORDER_URL || 'demo.vivapayments.com',
+    orderBasicAuth: process.env.VIVAWALLET_ORDER_BASIC_AUTH!,
+    loginBasicAuth: process.env.VIVAWALLET_LOGIN_BASIC_AUTH!,
   },
 };
 
