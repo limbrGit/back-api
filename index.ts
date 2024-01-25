@@ -22,9 +22,14 @@ import listRoutes from './src/routes/list';
 import watchRoutes from './src/routes/watch';
 import paymentRoutes from './src/routes/payment';
 import tokenRoutes from './src/routes/token';
+import userPlatformRoutes from './src/routes/userPlatform';
+import supportRoutes from './src/routes/support';
 
 // Tools
 import Logger from './src/tools/logger';
+
+// Service
+import TestConnectionDBService from './src/services/testConnectionDB';
 
 // Start express application
 const app: Express = express();
@@ -56,6 +61,8 @@ app.use('/list', listRoutes);
 app.use('/watch', watchRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/token', tokenRoutes);
+app.use('/userPlatform', userPlatformRoutes);
+app.use('/support', supportRoutes);
 
 // Check Service
 app.get(
@@ -63,7 +70,24 @@ app.get(
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
       Logger.info({ functionName: 'Get on /' }, req);
-      res.status(200).send({ data: 'Server is UP !' });
+      const connectioDB = await TestConnectionDBService.textConnectionDB(req);
+      if (connectioDB.valid) {
+        res
+          .status(200)
+          .send({
+            name: 'back-api',
+            status: 'Server is UP !',
+            db: 'Connected',
+          });
+      } else {
+        res
+          .status(503)
+          .send({
+            name: 'back-api',
+            status: 'Server is UP !',
+            db: 'Disconnected',
+          });
+      }
     } catch (error) {
       next(error);
     }

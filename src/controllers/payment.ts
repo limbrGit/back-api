@@ -2,14 +2,16 @@
 import { Request } from 'express';
 
 // Interfaces
-import { Link } from '../interfaces/content';
 import { PaymentOfferName } from '../interfaces/paymentOffer';
 import {
   PaymentTransaction,
   PaymentTransactionStatus,
   PaymentTransactionSQL,
 } from '../interfaces/paymentTransaction';
-import { UserSQL } from '../interfaces/user';
+import {
+  VivaPaymentOrder,
+  VivaPaymentOrderCreation,
+} from '../interfaces/vivawallet';
 
 // Tools
 import Logger from '../tools/logger';
@@ -25,7 +27,7 @@ import UserService from '../services/user';
 import PaymentOfferService from '../services/paymentOffer';
 import PaymentTransactionService from '../services/paymentTransaction';
 import VivawalletService from '../services/vivawallet';
-import { VivaPaymentOrder } from '../interfaces/vivawallet';
+import dayjs from 'dayjs';
 
 const startPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Set function name for logs
@@ -70,8 +72,9 @@ const startPayment = async (req: Request): Promise<PaymentTransaction> => {
     );
 
   // Create a Vivawallet payment order
-  const vivaPaymentOrder: VivaPaymentOrder =
+  const vivaPaymentOrder: VivaPaymentOrderCreation =
     await VivawalletService.createPaymentOrder(req, user, offer, transaction);
+  Logger.info({ functionName: functionName(1), vivaPaymentOrder }, req);
   if (!vivaPaymentOrder) {
     throw new AppError(CErrors.vivawalletCreatePaymentOrder);
   }
@@ -110,6 +113,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   if (user.deleted_at) {
     throw new AppError(CErrors.userDeleted);
   }
+  Logger.info({ functionName: functionName(0), a: 'AAA' }, req);
 
   // Get transaction
   let transaction: PaymentTransactionSQL =
@@ -124,6 +128,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.transactionOver);
   }
 
+  Logger.info({ functionName: functionName(0), a: 'BBB' }, req);
   // Check Vivawallet payment order
   const vivawalletPaymentOrder =
     await VivawalletService.getPaymentOrderFromOrderCode(req, transaction);
@@ -131,6 +136,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.vivawalletGetPaymentOrder);
   }
 
+  Logger.info({ functionName: functionName(0), a: 'CCC' }, req);
   // Get new status
   const getNewStatus = (stateId: number): PaymentTransactionStatus => {
     if (stateId === 0) {
@@ -146,6 +152,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   };
   const newStatus = getNewStatus(vivawalletPaymentOrder.StateId);
 
+  Logger.info({ functionName: functionName(0), a: 'DDD' }, req);
   // If transaction is paid
   if (newStatus === PaymentTransactionStatus.Paid) {
     // Get offer
@@ -157,17 +164,20 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       throw new AppError(CErrors.offerNotFound);
     }
 
+    Logger.info({ functionName: functionName(0), a: 'EEE' }, req);
     // Update user in DB with new tokens
     user = await UserService.updateUserSQL(req, {
       ...user,
       birthdate: undefined,
       tokens: user.tokens + offer.tokens,
+      token_end_date: dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss'),
     });
     if (!user) {
       throw new AppError(CErrors.getUser);
     }
   }
 
+  Logger.info({ functionName: functionName(0), a: 'FFF' }, req);
   // Update transaction
   transaction = await PaymentTransactionService.updatePaymentTransactionSQL(
     req,
@@ -176,6 +186,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       status: newStatus,
     }
   );
+  Logger.info({ functionName: functionName(0), a: 'GGG' }, req);
 
   // Return temporary just to send the link
   return transaction;

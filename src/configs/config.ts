@@ -36,6 +36,7 @@ const config: Config = {
     domain: process.env.MAIL_DOMAIN || 'lbmail.fr',
     user: process.env.MAIL_USER || 'accounts@lbmail.fr',
     pass: process.env.MAIL_PASS!,
+    supportEmail: process.env.MAIL_SUPPORT_EMAIL || 'support@lbmail.fr',
   },
 
   database: {
@@ -65,14 +66,14 @@ const config: Config = {
   },
 
   vivawallet: {
-    siteCode: process.env.VIVAWALLET_SITE_CODE || '6271',
+    siteCode: process.env.VIVAWALLET_SITE_CODE_PROD || '6271',
     paymentUrl:
-      process.env.VIVAWALLET_PAYMENT_URL || 'demo-api.vivapayments.com',
+      process.env.VIVAWALLET_PAYMENT_URL_PROD || 'demo-api.vivapayments.com',
     accountUrl:
-      process.env.VIVAWALLET_ACCOUNT_URL || 'demo-accounts.vivapayments.com',
-    orderUrl: process.env.VIVAWALLET_ORDER_URL || 'demo.vivapayments.com',
-    orderBasicAuth: process.env.VIVAWALLET_ORDER_BASIC_AUTH!,
-    loginBasicAuth: process.env.VIVAWALLET_LOGIN_BASIC_AUTH!,
+      process.env.VIVAWALLET_ACCOUNT_URL_PROD || 'demo-accounts.vivapayments.com',
+    orderUrl: process.env.VIVAWALLET_ORDER_URL_PROD || 'demo.vivapayments.com',
+    orderBasicAuth: process.env.VIVAWALLET_ORDER_BASIC_AUTH_PROD!,
+    loginBasicAuth: process.env.VIVAWALLET_LOGIN_BASIC_AUTH_PROD!,
   },
 };
 

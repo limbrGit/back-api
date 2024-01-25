@@ -1,5 +1,5 @@
 // Imports
-import { Request } from 'express';
+import e, { Request } from 'express';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 
@@ -39,12 +39,32 @@ const columnsGettable = `
   deleted_at
 `;
 
+export const getPlatformAccountPassword = (
+  req: Request,
+  platformAccount: PlatformAccountSQL
+): string => {
+  const functionName = (i: number) =>
+    'services/platformAccount.ts : getPlatformAccountPassword ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const deciphered = crypto.createDecipheriv(
+    config.cipher.algorithm,
+    Buffer.from(config.cipher[platformAccount.platform]),
+    Buffer.from(platformAccount.iv)
+  );
+  const decipheredPhrase =
+    deciphered.update(platformAccount.cipher, 'hex', 'utf-8') +
+    deciphered.final('utf-8');
+
+  return decipheredPhrase;
+};
+
 export const getPlatformAccountsFromIds = async (
   req: Request,
   ids: string[]
 ): Promise<PlatformAccountSQL[]> => {
   const functionName = (i: number) =>
-    'services/user.ts : getPlatformAccountsFromIds ' + i;
+    'services/platformAccount.ts : getPlatformAccountsFromIds ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -66,7 +86,7 @@ export const getPlatformAccountsFromEmails = async (
   emails: string[]
 ): Promise<PlatformAccountSQL[]> => {
   const functionName = (i: number) =>
-    'services/user.ts : getPlatformAccountsFromEmails ' + i;
+    'services/platformAccount.ts : getPlatformAccountsFromEmails ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -88,7 +108,7 @@ export const getPlatformAccountFromId = async (
   id: string
 ): Promise<PlatformAccountSQL> => {
   const functionName = (i: number) =>
-    'services/user.ts : getPlatformAccountFromId ' + i;
+    'services/platformAccount.ts : getPlatformAccountFromId ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -102,7 +122,14 @@ export const getPlatformAccountFromId = async (
   `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
-  return result[0];
+  const PlatformAccount = {
+    ...result[0],
+    password: getPlatformAccountPassword(req, result[0]),
+    iv: undefined,
+    cipher: undefined,
+  };
+
+  return PlatformAccount;
 };
 
 export const getPlatformAccountFromEmail = async (
@@ -110,7 +137,7 @@ export const getPlatformAccountFromEmail = async (
   email: string
 ): Promise<PlatformAccountSQL> => {
   const functionName = (i: number) =>
-    'services/user.ts : getPlatformAccountFromEmail ' + i;
+    'services/platformAccount.ts : getPlatformAccountFromEmail ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -124,27 +151,14 @@ export const getPlatformAccountFromEmail = async (
   `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
-  return result[0];
-};
+  const PlatformAccount = {
+    ...result[0],
+    password: getPlatformAccountPassword(req, result[0]),
+    iv: undefined,
+    cipher: undefined,
+  };
 
-export const getPlatformAccountPassword = (
-  req: Request,
-  platformAccount: PlatformAccountSQL
-): string => {
-  const functionName = (i: number) =>
-    'services/user.ts : getPlatformAccountPassword ' + i;
-  // Logger.info({ functionName: functionName(0) }, req);
-
-  const deciphered = crypto.createDecipheriv(
-    config.cipher.algorithm,
-    Buffer.from(config.cipher[platformAccount.platform]),
-    Buffer.from(platformAccount.iv)
-  );
-  const decipheredPhrase =
-    deciphered.update(platformAccount.cipher, 'hex', 'utf-8') +
-    deciphered.final('utf-8');
-
-  return decipheredPhrase;
+  return PlatformAccount;
 };
 
 export const createPlatformAccount = async (
@@ -162,7 +176,7 @@ export const createPlatformAccount = async (
     {
       method: 'POST',
       headers: {
-        Authorization: 'Basic ' + config.vivawallet.loginBasicAuth,
+        Authorization: req.headers.authorization,
       },
     }
   );
@@ -267,7 +281,12 @@ export const getAllPlatformAccount = async (
   `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
-  return result;
+  return result.map((e: PlatformAccountSQL[]) => ({
+    ...e,
+    password: undefined,
+    iv: undefined,
+    cipher: undefined,
+  }));
 };
 
 export const getPlatformAccountsAvailable = async (
@@ -278,6 +297,7 @@ export const getPlatformAccountsAvailable = async (
   const functionName = (i: number) =>
     'services/database.ts : getPlatformAccountsAvailable ' + i;
   Logger.info({ functionName: functionName(0) }, req);
+  Logger.info({ functionName: functionName(1), platforms }, req);
 
   const sql = `
     SELECT
@@ -291,19 +311,18 @@ export const getPlatformAccountsAvailable = async (
       platform_accounts
     LEFT JOIN users_platforms
     ON
-        users_platforms.platform_account_email = platform_accounts.email
+      users_platforms.platform_account_email = platform_accounts.email
+      AND (
+        users_platforms.end_date IS NULL
+        OR users_platforms.end_date > CURRENT_TIMESTAMP()
+      )
+      AND users_platforms.deleted_at IS NULL
     LEFT JOIN platform_info
     ON
         platform_accounts.platform = platform_info.name
     WHERE
       platform_accounts.active = 1
-      AND (
-        users_platforms.end_date IS NULL || users_platforms.end_date > CURRENT_TIMESTAMP()
-      )
-      AND users_platforms.deleted_at IS NULL
-      AND platform_accounts.platform IN (${platforms
-        .map((e) => "'" + e + "'")
-        .join(',')})
+      AND platform_accounts.platform IN (${platforms.map((e) => "'" + e + "'")})
     GROUP BY
       platform_accounts.email
     HAVING
@@ -337,7 +356,12 @@ export const getAllPlatformAccountActive = async (
   `;
   const result = await SqlService.sendSqlRequest(req, sql);
 
-  return result;
+  return result.map((e: PlatformAccountSQL[]) => ({
+    ...e,
+    password: undefined,
+    iv: undefined,
+    cipher: undefined,
+  }));
 };
 
 export const desactivationPlatformAccount = async (

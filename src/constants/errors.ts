@@ -213,6 +213,11 @@ const CErrors = {
     message: 'PROCESSING ERROR',
     detail: 'Error to get user',
   },
+  noUserPlatform: {
+    code: 500.6,
+    message: 'PROCESSING ERROR',
+    detail: 'Error to get user platform',
+  },
 };
 
 export default CErrors;

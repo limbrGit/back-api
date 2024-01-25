@@ -22,9 +22,7 @@ import PlatformAccountService from '../services/platformAccount';
 import ContentService from '../services/content';
 import UserPlatformService from '../services/userPlatforms';
 
-const startWatchContent = async (
-  req: Request
-): Promise<{ link: Link; platformAccount: PlatformAccountSQL }> => {
+const startWatchContent = async (req: Request): Promise<Link> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'controller/list.ts : startWatchContent ' + i;
@@ -99,13 +97,17 @@ const startWatchContent = async (
       );
 
     // Return link and platform
-    return {
-      platformAccount: platformAccount,
-      link: element.links.find(
-        (link) =>
-          link.available && link.platform === platformAlreadyUsed?.platform
-      )!,
-    };
+    return element.links.find(
+      (link) =>
+        link.available && link.platform === platformAlreadyUsed?.platform
+    )!;
+    // return {
+    //   platformAccount: platformAccount,
+    //   link: element.links.find(
+    //     (link) =>
+    //       link.available && link.platform === platformAlreadyUsed?.platform
+    //   )!,
+    // };
   }
 
   //! The user need a new platform account
@@ -117,6 +119,8 @@ const startWatchContent = async (
       platformInfos.map((e) => e.name)
     );
 
+  Logger.info({ functionName: functionName(1), platformInfos: platformInfos.map((e) => e.name) }, req);
+  Logger.info({ functionName: functionName(1), platformAccountsAvailables }, req);
   //! Find the platform with the less place
   if (platformAccountsAvailables.length > 0) {
     // In the availables, get the account platforms almost full and the cheapest
@@ -150,14 +154,19 @@ const startWatchContent = async (
     );
 
     // Return link and platform
-    return {
-      platformAccount: platformAccountAlmostFullAndCheapest[0],
-      link: element.links.find(
-        (link) =>
-          link.available &&
-          link.platform === platformAccountAlmostFullAndCheapest[0].platform
-      )!,
-    };
+    return element.links.find(
+      (link) =>
+        link.available &&
+        link.platform === platformAccountAlmostFullAndCheapest[0].platform
+    )!;
+    // return {
+    //   platformAccount: platformAccountAlmostFullAndCheapest[0],
+    //   link: element.links.find(
+    //     (link) =>
+    //       link.available &&
+    //       link.platform === platformAccountAlmostFullAndCheapest[0].platform
+    //   )!,
+    // };
   }
 
   //! There is no platform account available we need to create a new one
@@ -178,12 +187,15 @@ const startWatchContent = async (
     platformCheapest
   );
 
-  return {
-    platformAccount: newPlatformAccount,
-    link: element.links.find(
-      (link) => link.platform === newPlatformAccount.platform
-    )!,
-  };
+  return element.links.find(
+    (link) => link.platform === newPlatformAccount.platform
+  )!;
+  // return {
+  //   platformAccount: newPlatformAccount,
+  //   link: element.links.find(
+  //     (link) => link.platform === newPlatformAccount.platform
+  //   )!,
+  // };
 };
 
 export default {

@@ -9,18 +9,18 @@ import Logger from '../tools/logger';
 import authenticateToken from '../middlewares/authentication';
 
 // Controllers
-import TokenController from '../controllers/token';
+import SupportController from '../controllers/support';
 
 const tokenApis = express.Router();
 
-// Use one token
+// Send contact-us email in platform
 tokenApis.post(
-  '/useOneToken',
+  '/contact-us',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
-      Logger.info({ functionName: 'POSt on /token/useOneToken' }, req);
-      const result = await TokenController.useOneToken(req);
+      Logger.info({ functionName: 'POST on /support/contact-us' }, req);
+      const result = await SupportController.contactUs(req);
       res.json(result);
     } catch (error) {
       next(error);

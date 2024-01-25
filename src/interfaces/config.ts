@@ -7,6 +7,7 @@ export interface MailServer {
   domain: string;
   user: string;
   pass: string;
+  supportEmail: string;
 }
 
 export interface Database {
