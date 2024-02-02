@@ -75,7 +75,7 @@ export const sendCodeMail = async (
           <header style="margin-bottom: 40px; text-align: center; margin-top: 20px;">
             <img style="width: 150px; display: block; margin: auto;" src="https://limbr.fr/Logo/Turquoisebg_off.png" alt="Limbr Logo" />
           </header>
-          <section style="color: #040311; font-family: Tahoma, Helvetica Neue,Helvetica,Roboto,Segoe UI,sans-serif; font-size: 16px; line-height: 1.5;">
+          <section style="color: #040311; font-family: Verdana; font-size: 14px; line-height: 1.5;">
             <div>Bienvenue chez <strong>Limbr</strong> !</div><br>
             <div>Voici votre <strong>code de vérification</strong> pour terminer votre inscription :</div>
             <div style="text-align: center; background-color: #e6e6e6; border-radius: 50px; width: 50%; padding: 10px; margin: 20px auto; font-size: 35px; font-weight: bold; letter-spacing: 5px;">${user.confirmation_code}</div>
@@ -83,27 +83,27 @@ export const sendCodeMail = async (
             <div>Et notre catalogue continue de grandir.</div><br>
             <div>L'équipe Limbr</div>
           </section>
-          <footer style="color: #999; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
-            <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
-              83% 557% at 3% 23%,
-              #58c4f6 0%,
-              #5df7a4 22.92%,
-              #abb3fc 42.71%,
-              #feb0fe 61.46%,
-              #e1f664 80.21%,
-              #2ad0ca 100%
-            );">
-            <p>
-              Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
-              <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-              <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
-            </p>
-            <p>
-              Cet e-mail a été envoyé à ${user.email}.
-              <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
-              <br>© 2023 Limbr et ses entités affiliées. Tous droits réservés.
-            </p>
-          </footer>
+          <footer style="color: #4F4F59; font-family: Verdana; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
+          <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
+            83% 557% at 3% 23%,
+            #58c4f6 0%,
+            #5df7a4 22.92%,
+            #abb3fc 42.71%,
+            #feb0fe 61.46%,
+            #e1f664 80.21%,
+            #2ad0ca 100%
+          );">
+          <p>
+            Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
+            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #4F4F59">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #4F4F59">politique de confidentialité</a>.
+          </p>
+          <p>
+            Cet e-mail a été envoyé à <a href="mailto:${user.email}" target="_blank" style="color: #4F4F59; text-decoration: none">${user.email}</a>.
+            <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
+            <br>© 2023 Limbr, SAS. Tous droits réservés.
+          </p>
+        </footer>
         </div>
       </body>
       </html>
@@ -138,12 +138,12 @@ export const sendForgotPasswordMail = async (
       <html>
       <head>
       </head>
-      <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+      <body style="margin: 0; padding: 20px; font-family: Verdana, sans-serif; background-color: #f4f4f4;">
         <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px #e0e0e0;">
           <header style="margin-bottom: 40px; text-align: center; margin-top: 20px;">
             <img style="width: 150px; display: block; margin: auto;" src="https://limbr.fr/Logo/Turquoisebg_off.png" alt="Limbr Logo" />
           </header>
-          <section style="color: #040311; font-family: Tahoma, Helvetica Neue,Helvetica,Roboto,Segoe UI,sans-serif; font-size: 16px; line-height: 1.5;">
+          <section style="color: #040311; font-size: 14px; line-height: 1.5;">
             <div>Bonjour, </div><br>
             <div>Vous avez fait une demande de <strong>mot de passe oublié</strong>, voici un lien pour créer un nouveau mot de passe :</div><br>
             <div style="text-align: center;">
@@ -153,27 +153,27 @@ export const sendForgotPasswordMail = async (
             </div><br>
             <div>L'équipe Limbr</div>
           </section>
-          <footer style="color: #999; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
-            <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
-              83% 557% at 3% 23%,
-              #58c4f6 0%,
-              #5df7a4 22.92%,
-              #abb3fc 42.71%,
-              #feb0fe 61.46%,
-              #e1f664 80.21%,
-              #2ad0ca 100%
-            );">
-            <p>
-              Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
-              <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-              <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
-            </p>
-            <p>
-              Cet e-mail a été envoyé à ${user.email}.
-              <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
-              <br>© 2023 Limbr et ses entités affiliées. Tous droits réservés.
-            </p>
-          </footer>
+          <footer style="color: #4F4F59; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
+          <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
+            83% 557% at 3% 23%,
+            #58c4f6 0%,
+            #5df7a4 22.92%,
+            #abb3fc 42.71%,
+            #feb0fe 61.46%,
+            #e1f664 80.21%,
+            #2ad0ca 100%
+          );">
+          <p>
+            Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
+            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #4F4F59">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #4F4F59">politique de confidentialité</a>.
+          </p>
+          <p>
+            Cet e-mail a été envoyé à <a href="mailto:${user.email}" target="_blank" style="color: #4F4F59; text-decoration: none">${user.email}</a>.
+            <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
+            <br>© 2023 Limbr, SAS. Tous droits réservés.
+          </p>
+        </footer>
         </div>
       </body>
       </html>
@@ -207,18 +207,18 @@ export const sendResetPasswordMail = async (
     <html>
     <head>
     </head>
-    <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <body style="margin: 0; padding: 20px; font-family: Verdana, sans-serif; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px #e0e0e0;">
         <header style="margin-bottom: 40px; text-align: center; margin-top: 20px;">
           <img style="width: 150px; display: block; margin: auto;" src="https://limbr.fr/Logo/Turquoisebg_off.png" alt="Limbr Logo" />
         </header>
-        <section style="color: #040311; font-family: Tahoma, Helvetica Neue, Helvetica, Roboto, Segoe UI, sans-serif; font-size: 16px; line-height: 1.5;">
+        <section style="color: #040311 font-size: 14px; line-height: 1.5;">
           <div>Bonjour,</div><br>
           <div>Votre <strong>mot de passe</strong> a bien été <strong>mis à jour</strong>.</div>
           <div>Si vous n'êtes pas à l'origine de ce changement, merci de nous contacter rapidement, nous ferons le nécessaire.</div><br>
           <div>L'équipe Limbr</div>
         </section>
-        <footer style="color: #999; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
+        <footer style="color: #4F4F59; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
           <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
             83% 557% at 3% 23%,
             #58c4f6 0%,
@@ -230,13 +230,13 @@ export const sendResetPasswordMail = async (
           );">
           <p>
             Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
-            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
+            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #4F4F59">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #4F4F59">politique de confidentialité</a>.
           </p>
           <p>
-            Cet e-mail a été envoyé à ${user.email}.
+            Cet e-mail a été envoyé à <a href="mailto:${user.email}" target="_blank" style="color: #4F4F59; text-decoration: none">${user.email}</a>.
             <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
-            <br>© 2023 Limbr et ses entités affiliées. Tous droits réservés.
+            <br>© 2023 Limbr, SAS. Tous droits réservés.
           </p>
         </footer>
       </div>
@@ -276,12 +276,12 @@ export const sendContactUsMail = async (
     <html>
     <head>
     </head>
-    <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <body style="margin: 0; padding: 20px; font-family: Verdana, sans-serif; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px #e0e0e0;">
         <header style="margin-bottom: 40px; text-align: center; margin-top: 20px;">
           <img style="width: 150px; display: block; margin: auto;" src="https://limbr.fr/Logo/Turquoisebg_off.png" alt="Limbr Logo" />
         </header>
-        <section style="color: #040311; font-family: Tahoma, Helvetica Neue, Helvetica, Roboto, Segoe UI, sans-serif; font-size: 16px; line-height: 1.5;">
+        <section style="color: #040311; font-size: 14px; line-height: 1.5;">
           <div>Bonjour,</div><br>
           <div>Voici le message de <strong>${user.firstname} ${user.lastname}</strong></div>
           <div>Email : <strong>${user.email}</strong></div>
@@ -290,7 +290,7 @@ export const sendContactUsMail = async (
           <div>---------------------</div><br>
           <div>L'équipe Limbr</div>
         </section>
-        <footer style="color: #999; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
+        <footer style="color: #4F4F59; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
           <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
             83% 557% at 3% 23%,
             #58c4f6 0%,
@@ -302,13 +302,13 @@ export const sendContactUsMail = async (
           );">
           <p>
             Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
-            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
+            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #4F4F59">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #4F4F59">politique de confidentialité</a>.
           </p>
           <p>
-            Cet e-mail a été envoyé à ${config.mailServer.supportEmail}.
+            Cet e-mail a été envoyé à <a href="mailto:${user.email}" target="_blank" style="color: #4F4F59; text-decoration: none">${user.email}</a>.
             <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
-            <br>© 2023 Limbr et ses entités affiliées. Tous droits réservés.
+            <br>© 2023 Limbr, SAS. Tous droits réservés.
           </p>
         </footer>
       </div>
@@ -337,21 +337,22 @@ export const sendContactUsMail = async (
     <html>
     <head>
     </head>
-    <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <body style="margin: 0; padding: 20px; font-family: Verdana, sans-serif; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0px 0px 10px 7px #e0e0e0;">
         <header style="margin-bottom: 40px; text-align: center; margin-top: 20px;">
-          <img style="width: 150px; display: block; margin: auto;" src="https://limbr.fr/Logo/Turquoisebg_off.png" alt="Limbr Logo" />
+          <img style="width: 150px; display: block; margin: auto;" src="https://www.limbr.fr/Logo/Turquoisebg_off.png" alt="Limbr Logo" />
         </header>
-        <section style="color: #040311; font-family: Tahoma, Helvetica Neue, Helvetica, Roboto, Segoe UI, sans-serif; font-size: 16px; line-height: 1.5;">
+        <section style="color: #040311; font-size: 14px; line-height: 1.5;">
           <div>Bonjour,</div>
           <br>
-          <div>Merci d’avoir contacté l’équipe Limbr !</div>
-          <div>Nous avons bien pris en compte votre demande et allons la traiter dans les meilleurs délais.</div>
-          <div>En attendant, vous pouvez consulter notre page <a href="https://limbr.fr/faq">FAQ</a> qui vous apportera peut-être de premiers éléments de réponse.</div>
+          <div>Nous vous remercions d'avoir pris contact avec notre équipe.</div>
+          <div>Votre demande a été enregistrée avec attention et sera traitée dans les plus brefs délais.</div>
+          <br>
+          <div>Dans l'intervalle, nous vous invitons à consulter notre <strong><a href="https://limbr.fr/faq" style="color: #24C6C0; text-decoration: none">page FAQ</a></strong>, qui pourrait vous fournir des informations utiles et des éléments de réponse à certaines de vos interrogations.</div>
           <br>
           <div>L'équipe Limbr</div>
         </section>
-        <footer style="color: #999; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
+        <footer style="color: #4F4F59; text-align: start; font-size: 10px; font-style: italic; margin-top: 40px;">
           <hr style="height: 3px; border: none; margin: 20px 0; background: radial-gradient(
             83% 557% at 3% 23%,
             #58c4f6 0%,
@@ -363,13 +364,13 @@ export const sendContactUsMail = async (
           );">
           <p>
             Vous pouvez supprimer votre compte Limbr à tout moment depuis les paramètres de votre espace personnel.
-            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #06f;">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
-            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #06f;">politique de confidentialité</a>.
+            <br>Consultez les <a href="https://limbr.fr/cgu" style="color: #4F4F59">conditions d'utilisation</a> pour obtenir plus d'informations sur notre produit.
+            <br>Consultez notre <a href="https://limbr.fr/privacy" style="color: #4F4F59">politique de confidentialité</a>.
           </p>
           <p>
-            Cet e-mail a été envoyé à ${user.email}.
+            Cet e-mail a été envoyé à <a href="mailto:${user.email}" target="_blank" style="color: #4F4F59; text-decoration: none">${user.email}</a>.
             <br>Ne pas répondre à cet e-mail, car cette adresse est liée à une messagerie automatique.
-            <br>© 2023 Limbr et ses entités affiliées. Tous droits réservés.
+            <br>© 2023 Limbr, SAS. Tous droits réservés.
           </p>
         </footer>
       </div>

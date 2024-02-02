@@ -52,6 +52,7 @@ export const getUserPlatformsFromUserSQL = async (
     WHERE
       ${active ? 'end_date > DATE(NOW())  AND' : ''}
       user_email = ?
+      AND users_platforms.deleted_at IS NULL
     ;
   `;
   const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(req, sql, [
@@ -84,6 +85,7 @@ export const getUserPlatformsFromPlatformSQL = async (
     WHERE
       ${active ? 'end_date > DATE(NOW())  AND' : ''}
       platform_account_email = ?
+      AND users_platforms.deleted_at IS NULL
     ;
   `;
   const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(req, sql, [
@@ -118,6 +120,7 @@ export const getUserPlatformsFromUserAndPlatformSQL = async (
       ${active ? 'end_date > DATE(NOW())  AND' : ''}
       user_email = ? AND
       platform_account_email = ?
+      AND users_platforms.deleted_at IS NULL
     ;
   `;
   const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(req, sql, [

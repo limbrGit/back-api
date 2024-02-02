@@ -119,8 +119,8 @@ const startWatchContent = async (req: Request): Promise<Link> => {
       platformInfos.map((e) => e.name)
     );
 
-  Logger.info({ functionName: functionName(1), platformInfos: platformInfos.map((e) => e.name) }, req);
-  Logger.info({ functionName: functionName(1), platformAccountsAvailables }, req);
+  // Logger.info({ functionName: functionName(1), platformInfos: platformInfos.map((e) => e.name) }, req);
+  // Logger.info({ functionName: functionName(1), platformAccountsAvailables }, req);
   //! Find the platform with the less place
   if (platformAccountsAvailables.length > 0) {
     // In the availables, get the account platforms almost full and the cheapest
