@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import fetch from 'node-fetch';
 
 // Interfaces
 import { UserSQL } from '../interfaces/user';
@@ -17,6 +18,9 @@ import CErrors from '../constants/errors';
 
 // Services
 import SqlService from './sql';
+
+// Config
+import config from '../configs/config';
 
 const columnsGettable = `
   id,
@@ -50,7 +54,7 @@ export const getUserPlatformsFromUserSQL = async (
     ON
       users_platforms.platform_account_email = platform_accounts.email
     WHERE
-      ${active ? 'end_date > DATE(NOW())  AND' : ''}
+      ${active ? 'end_date > NOW()  AND' : ''}
       user_email = ?
       AND users_platforms.deleted_at IS NULL
     ;
@@ -180,9 +184,37 @@ export const createUserPlatformsSQL = async (
   return result[0];
 };
 
+export const getUserPlatformOtp = async (
+  req: Request,
+  userPlatform: UserPlatformSQL,
+  startTimer: string
+): Promise<{ digit: string }> => {
+  const functionName = (i: number) =>
+    'services/list.ts : createUserPlatformsSQL ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  // Create account
+  const response = await fetch(
+    `${config.limbr.accountApi}/${userPlatform.platform}/otp?email=${userPlatform.platform_account_email}&startTimer=${startTimer}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+    }
+  );
+
+  // Get the result
+  const data: { digit: string } = await response.json();
+  Logger.info({ functionName: functionName(2), data: data }, req);
+
+  return data;
+};
+
 export default {
   getUserPlatformsFromUserSQL,
   getUserPlatformsFromPlatformSQL,
   getUserPlatformsFromUserAndPlatformSQL,
   createUserPlatformsSQL,
+  getUserPlatformOtp,
 };

@@ -100,5 +100,21 @@ userApis.delete(
   })
 );
 
+// Update user subs
+userApis.put(
+  '/:id/subs',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info({ functionName: 'PUT on /users/:id/subs' }, req);
+      const result = await UserController.updateSubs(req);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+
 
 export default userApis;

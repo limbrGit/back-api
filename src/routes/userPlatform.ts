@@ -28,4 +28,19 @@ userPlatformApis.get(
   })
 );
 
+// Get OTP
+userPlatformApis.get(
+  '/:platform/otp',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      Logger.info({ functionName: 'GET on /userPlatform/:platform/otp' }, req);
+      const result = await UserPlatformController.getUserPlatformOtp(req);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 export default userPlatformApis;

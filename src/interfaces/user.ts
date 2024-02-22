@@ -23,7 +23,7 @@ export interface User {
   gender?: string | null;
   description?: string | null;
   picture?: string | null;
-  subs?: Subs;
+  subs?: string[] | string;
   admin?: boolean;
 }
 
@@ -39,12 +39,12 @@ export interface UserSQL extends User {
   // email: string;
   // username: string;
   // password: string;
-  hash: string;
-  salt: string;
+  hash?: string;
+  salt?: string;
   // tokens: number;
   // token_valid: number;
   active_date: number | null;
-  confirmation_code: string;
+  confirmation_code?: string;
   // firstname?: string | null;
   // lastname?: string | null;
   // birthdate?: string | null;
@@ -76,5 +76,5 @@ export interface UpdateBody {
   gender?: Gender;
   description?: string;
   picture?: string;
-  subs?: Subs;
+  subs?: string | string[];
 }

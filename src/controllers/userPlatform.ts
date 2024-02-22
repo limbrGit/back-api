@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import dayjs from 'dayjs';
 
 // Interfaces
 import { PlatformAccountSQL } from '../interfaces/database';
@@ -69,6 +70,59 @@ const getUserPlatform = async (req: Request): Promise<PlatformAccountSQL> => {
   return platformAccount;
 };
 
+const getUserPlatformOtp = async (req: Request): Promise<string> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'controller/list.ts : getUserPlatformOtp ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const { platform }: { platform?: string } = req.params;
+  const { startTimer }: { startTimer?: string } = req.query;
+
+  // Check param and token
+  if (!platform) {
+    throw new AppError(CErrors.missingParameter);
+  }
+
+  // Check user
+  let user = await UserService.getUserFromIdSQL(req, req?.user?.id);
+  if (!user) {
+    throw new AppError(CErrors.userNotFound);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+
+  // Check if user have a current token
+  if (user.token_end_date && (user.token_end_date as number) < Date.now()) {
+    throw new AppError(CErrors.noCurrentToken);
+  }
+
+  // get user platforms for the user
+  const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
+    req,
+    user
+  );
+  if (!userPlatforms || userPlatforms.length === 0) {
+    throw new AppError(CErrors.noUserPlatform);
+  }
+
+  // Find the good user platform
+  const userPlatform = userPlatforms.find((e) => e.platform === platform);
+  if (!userPlatform) {
+    throw new AppError(CErrors.noUserPlatform);
+  }
+
+  const otp = await UserPlatformService.getUserPlatformOtp(
+    req,
+    userPlatform,
+    startTimer || dayjs().format('X')
+  );
+
+  return otp;
+};
+
 export default {
   getUserPlatform,
+  getUserPlatformOtp,
 };

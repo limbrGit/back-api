@@ -194,6 +194,8 @@ export const updateUserSQL = async (
     WHERE
       users.id = '${userSQL.id}'
   `;
+  Logger.info({ functionName: functionName(1), sql }, req);
+
   const insertResult = await SqlService.sendSqlRequest(req, sql);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);

@@ -37,6 +37,7 @@ const startWatchContent = async (req: Request): Promise<Link> => {
   if (!['content', 'episode'].includes(type)) {
     throw new AppError(CErrors.wrongTypeFormat);
   }
+  Logger.info({ functionName: functionName(1), type: type, id: id }, req);
 
   // Check user
   const user = await UserService.getUserFromIdSQL(req, req?.user?.id);

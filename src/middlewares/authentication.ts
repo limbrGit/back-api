@@ -12,7 +12,8 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   // Set function name for logs
   const functionName = (i: number) =>
     'middleware/authentication.ts : authenticateToken ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  Logger.info({ functionName: functionName(0), fullUrl: fullUrl }, req);
 
   // Find token
   const token = req.headers['authorization']?.split(' ')[1];

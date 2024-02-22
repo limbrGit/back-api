@@ -1,5 +1,5 @@
 // Imports
-import e, { Request } from 'express';
+import { Request } from 'express';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 

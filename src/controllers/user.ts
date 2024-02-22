@@ -61,15 +61,13 @@ const getUserById = async (req: Request): Promise<User> => {
     throw new AppError(CErrors.userDeleted);
   }
 
+  delete result.hash;
+  delete result.salt;
+  delete result.confirmation_code;
+
   return {
     ...result,
-    password: undefined,
-    hash: undefined,
-    salt: undefined,
-    confirmation_code: undefined,
-    subs: result.subs
-      ? flatObj({ ...result.subs.split(',').map((e) => ({ [e]: true })) })
-      : null,
+    subs: result.subs ? (result.subs as string).split(',') : [],
   };
 };
 
@@ -360,6 +358,51 @@ const deleteUser = async (req: Request): Promise<User> => {
   };
 };
 
+const updateSubs = async (req: Request): Promise<User> => {
+  // Set function name for logs
+  const functionName = (i: number) => 'controller/user.ts : updateSubs ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  // Check params
+  const { subs }: UpdateBody = req.body;
+  if (!subs) {
+    throw new AppError(CErrors.missingParameter);
+  }
+
+  // Check param and token
+  if (typeof req.params.id !== 'string') {
+    throw new AppError(CErrors.missingParameter);
+  } else if (req?.user?.id !== req.params.id) {
+    throw new AppError(CErrors.forbidden);
+  }
+
+  const user = await UserService.getUserFromIdSQL(req, req.params.id);
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+
+  const userSQL: UserSQL = {
+    id: req?.user?.id,
+    username: user.username,
+    subs: subs.toString(),
+  };
+  Logger.info({ functionName: functionName(1), userSQL }, req);
+
+  // Create user in DB
+  const result = await UserService.updateUserSQL(req, userSQL);
+
+  return {
+    ...result,
+    password: undefined,
+    hash: undefined,
+    salt: undefined,
+    confirmation_code: undefined,
+    subs: result.subs
+      ? flatObj({ ...result.subs.split(',').map((e) => ({ [e]: true })) })
+      : null,
+  };
+};
+
 export default {
   getAll,
   getUserById,
@@ -367,4 +410,5 @@ export default {
   updatePassword,
   update,
   deleteUser,
+  updateSubs,
 };
