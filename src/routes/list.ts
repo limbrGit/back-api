@@ -4,6 +4,7 @@ import asyncHandler from 'express-async-handler';
 import ListController from '../controllers/list';
 
 // Tools
+import Notifications from '../tools/notifications';
 import Logger from '../tools/logger';
 
 // Middlewares
@@ -16,11 +17,16 @@ listApis.get(
   '/',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /list';
     try {
-      Logger.info({ functionName: 'GET on /list' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await ListController.getAll(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -31,11 +37,16 @@ listApis.get(
   '/contents',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /list/contents';
     try {
-      Logger.info({ functionName: 'GET on /list/contents' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await ListController.getAllContents(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -46,11 +57,16 @@ listApis.post(
   '/',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'POST on /list';
     try {
-      Logger.info({ functionName: 'POST on /list' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await ListController.add(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -61,11 +77,16 @@ listApis.delete(
   '/:content_id',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'DELETE on /list/:content_id';
     try {
-      Logger.info({ functionName: 'DELETE on /list/:content_id' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await ListController.remove(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })

@@ -4,6 +4,7 @@ import asyncHandler from 'express-async-handler';
 import UserController from '../controllers/user';
 
 // Tools
+import Notifications from '../tools/notifications';
 import Logger from '../tools/logger';
 
 // Middlewares
@@ -16,11 +17,16 @@ userApis.get(
   '/',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /users';
     try {
-      Logger.info({ functionName: 'GET on /users' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.getAll(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -31,11 +37,16 @@ userApis.get(
   '/:id',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /users/:id';
     try {
-      Logger.info({ functionName: 'GET on /users/:id' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.getUserById(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -45,11 +56,16 @@ userApis.get(
 userApis.post(
   '/create',
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'POST on /users/create';
     try {
-      Logger.info({ functionName: 'POST on /users/create' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.create(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -60,11 +76,16 @@ userApis.put(
   '/password',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'PUT on /users/password';
     try {
-      Logger.info({ functionName: 'PUT on /users/password' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.updatePassword(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -75,11 +96,16 @@ userApis.put(
   '/:id',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'PUT on /users/:id';
     try {
-      Logger.info({ functionName: 'PUT on /users/:id' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.update(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -90,11 +116,16 @@ userApis.delete(
   '/:id',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'DELETE on /users/:id';
     try {
-      Logger.info({ functionName: 'DELETE on /users/:id' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.deleteUser(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
@@ -105,16 +136,19 @@ userApis.put(
   '/:id/subs',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'PUT on /users/:id/subs';
     try {
-      Logger.info({ functionName: 'PUT on /users/:id/subs' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserController.updateSubs(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })
 );
-
-
 
 export default userApis;

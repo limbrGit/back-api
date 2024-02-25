@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import asyncHandler from 'express-async-handler';
 
 // Tools
+import Notifications from '../tools/notifications';
 import Logger from '../tools/logger';
 
 // Middlewares
@@ -18,11 +19,16 @@ tokenApis.post(
   '/useOneToken',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'POSt on /token/useOneToken';
     try {
-      Logger.info({ functionName: 'POSt on /token/useOneToken' }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await TokenController.useOneToken(req);
       res.json(result);
     } catch (error) {
+      Notifications.sendNotification(
+        { message: 'Error on : ' + functionName, data: error },
+        req
+      );
       next(error);
     }
   })

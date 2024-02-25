@@ -66,6 +66,10 @@ export interface Vivawallet {
   loginBasicAuth: string;
 }
 
+export interface Notifications {
+  webhookTeams: string;
+}
+
 export interface Config {
   port: number;
   serverName: string;
@@ -78,4 +82,5 @@ export interface Config {
   limbr: LimbrLinks;
   cipher: CipherKeys;
   vivawallet: Vivawallet;
+  notifications: Notifications;
 }

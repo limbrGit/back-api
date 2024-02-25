@@ -75,6 +75,10 @@ const config: Config = {
     orderBasicAuth: process.env.VIVAWALLET_ORDER_BASIC_AUTH_PROD!,
     loginBasicAuth: process.env.VIVAWALLET_LOGIN_BASIC_AUTH_PROD!,
   },
+
+  notifications: {
+    webhookTeams: process.env.NOTIFICATIONS_WEBHOOK_TEAMS!,
+  },
 };
 
 export default config;
