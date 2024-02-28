@@ -43,7 +43,7 @@ export const rdmString = ({
 
 export const checkPassword = (password: string): boolean => {
   const regularExpression =
-    /^(?=.*([A-Z]){1,})(?=.*[!@#$&*]{1,})(?=.*[0-9]{1,})(?=.*[a-z]{1,}).{8,128}$/;
+    /^(?=.*([A-Z]){1,})(?=.*[!@#$&*()]{1,})(?=.*[0-9]{1,})(?=.*[a-z]{1,}).{8,128}$/;
   return regularExpression.test(password);
 };
 
