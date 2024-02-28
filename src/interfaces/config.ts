@@ -71,6 +71,7 @@ export interface Notifications {
 }
 
 export interface Config {
+  env: string;
   port: number;
   serverName: string;
   delay: number;

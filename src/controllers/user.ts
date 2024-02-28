@@ -200,7 +200,7 @@ const updatePassword = async (req: Request): Promise<User> => {
   const userUpdated: UserSQL = await UserService.changePasswordUserSQL(
     req,
     user,
-    newPassword,
+    // newPassword,
     salt,
     hash
   );

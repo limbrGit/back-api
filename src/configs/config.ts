@@ -1,9 +1,16 @@
+// Imports
 import dotenv from 'dotenv';
+
+// Interfaces
 import { Config } from '../interfaces/config';
+
+// Constants
+import { ENV_DEV } from '../constants/environement';
 
 dotenv.config();
 
 const config: Config = {
+  env: process.env.ENV || ENV_DEV,
   port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
   serverName: process.env.SERVER_NAME || 'back-api',
   delay: process.env.DELAY ? parseInt(process.env.DELAY) : 100, // 130 in prod

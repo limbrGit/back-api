@@ -20,7 +20,6 @@ const columnsGettable = `
   id,
   email,
   username,
-  password,
   hash,
   salt,
   tokens,
@@ -133,7 +132,6 @@ export const createUserSQL = async (
       id,
       email,
       username,
-      password,
       hash,
       salt,
       tokens,
@@ -148,7 +146,6 @@ export const createUserSQL = async (
       '${userSQL.id}',
       '${userSQL.email}',
       '${userSQL.username}',
-      '${userSQL.password}',
       '${userSQL.hash}',
       '${userSQL.salt}',
       0,
@@ -209,7 +206,7 @@ export const updateUserSQL = async (
 export const changePasswordUserSQL = async (
   req: Request,
   userSQL: UserSQL,
-  password: string,
+  // password: string,
   salt: string,
   hash: string
 ): Promise<UserSQL> => {
@@ -219,7 +216,6 @@ export const changePasswordUserSQL = async (
   const sql = `
     UPDATE users
     SET
-      password = '${password}',
       salt = '${salt}',
       hash = '${hash}',
       updated_at = NOW()

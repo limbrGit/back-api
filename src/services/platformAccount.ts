@@ -26,7 +26,6 @@ import SqlService from './sql';
 const columnsGettable = `
   id,
   email,
-  password,
   iv,
   cipher,
   platform,
@@ -59,78 +58,78 @@ export const getPlatformAccountPassword = (
   return decipheredPhrase;
 };
 
-export const getPlatformAccountsFromIds = async (
-  req: Request,
-  ids: string[]
-): Promise<PlatformAccountSQL[]> => {
-  const functionName = (i: number) =>
-    'services/platformAccount.ts : getPlatformAccountsFromIds ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const getPlatformAccountsFromIds = async (
+//   req: Request,
+//   ids: string[]
+// ): Promise<PlatformAccountSQL[]> => {
+//   const functionName = (i: number) =>
+//     'services/platformAccount.ts : getPlatformAccountsFromIds ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `
-    SELECT
-      ${columnsGettable}
-    FROM platform_accounts
-    WHERE
-      platform_accounts.id IN (${ids.map((e) => "'" + e + "'")})=
-    ;
-  `;
-  const result = await SqlService.sendSqlRequest(req, sql);
-  Logger.info({ functionName: functionName(1), result: result.length }, req);
+//   const sql = `
+//     SELECT
+//       ${columnsGettable}
+//     FROM platform_accounts
+//     WHERE
+//       platform_accounts.id IN (${ids.map((e) => "'" + e + "'")})=
+//     ;
+//   `;
+//   const result = await SqlService.sendSqlRequest(req, sql);
+//   Logger.info({ functionName: functionName(1), result: result.length }, req);
 
-  return result;
-};
+//   return result;
+// };
 
-export const getPlatformAccountsFromEmails = async (
-  req: Request,
-  emails: string[]
-): Promise<PlatformAccountSQL[]> => {
-  const functionName = (i: number) =>
-    'services/platformAccount.ts : getPlatformAccountsFromEmails ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const getPlatformAccountsFromEmails = async (
+//   req: Request,
+//   emails: string[]
+// ): Promise<PlatformAccountSQL[]> => {
+//   const functionName = (i: number) =>
+//     'services/platformAccount.ts : getPlatformAccountsFromEmails ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `
-    SELECT
-      ${columnsGettable}
-    FROM platform_accounts
-    WHERE
-      platform_accounts.email IN (${emails.map((e) => "'" + e + "'")})
-    ;
-  `;
-  const result = await SqlService.sendSqlRequest(req, sql);
-  Logger.info({ functionName: functionName(1), result: result.length }, req);
+//   const sql = `
+//     SELECT
+//       ${columnsGettable}
+//     FROM platform_accounts
+//     WHERE
+//       platform_accounts.email IN (${emails.map((e) => "'" + e + "'")})
+//     ;
+//   `;
+//   const result = await SqlService.sendSqlRequest(req, sql);
+//   Logger.info({ functionName: functionName(1), result: result.length }, req);
 
-  return result;
-};
+//   return result;
+// };
 
-export const getPlatformAccountFromId = async (
-  req: Request,
-  id: string
-): Promise<PlatformAccountSQL> => {
-  const functionName = (i: number) =>
-    'services/platformAccount.ts : getPlatformAccountFromId ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const getPlatformAccountFromId = async (
+//   req: Request,
+//   id: string
+// ): Promise<PlatformAccountSQL> => {
+//   const functionName = (i: number) =>
+//     'services/platformAccount.ts : getPlatformAccountFromId ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `
-    SELECT
-      ${columnsGettable}
-    FROM platform_accounts
-    WHERE
-      platform_accounts.id = "${id}"
-    LIMIT 1
-    ;
-  `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+//   const sql = `
+//     SELECT
+//       ${columnsGettable}
+//     FROM platform_accounts
+//     WHERE
+//       platform_accounts.id = "${id}"
+//     LIMIT 1
+//     ;
+//   `;
+//   const result = await SqlService.sendSqlRequest(req, sql);
 
-  const PlatformAccount = {
-    ...result[0],
-    password: getPlatformAccountPassword(req, result[0]),
-    iv: undefined,
-    cipher: undefined,
-  };
+//   const PlatformAccount = {
+//     ...result[0],
+//     password: getPlatformAccountPassword(req, result[0]),
+//     iv: undefined,
+//     cipher: undefined,
+//   };
 
-  return PlatformAccount;
-};
+//   return PlatformAccount;
+// };
 
 export const getPlatformAccountFromEmail = async (
   req: Request,
@@ -191,103 +190,103 @@ export const createPlatformAccount = async (
   return platformAccount;
 };
 
-export const updatePlatformAccountPassword = async (
-  req: Request,
-  platformAccount: PlatformAccountSQL,
-  newPassword: string
-): Promise<PlatformAccountSQL> => {
-  // Set function name for logs
-  const functionName = (i: number) =>
-    'services/database.ts : updatePlatformAccountPassword ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const updatePlatformAccountPassword = async (
+//   req: Request,
+//   platformAccount: PlatformAccountSQL,
+//   newPassword: string
+// ): Promise<PlatformAccountSQL> => {
+//   // Set function name for logs
+//   const functionName = (i: number) =>
+//     'services/database.ts : updatePlatformAccountPassword ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const iv = rdmString({
-    length: 16,
-    speSelect: true,
-  });
-  const cipher = crypto.createCipheriv(
-    config.cipher.algorithm,
-    Buffer.from(config.cipher[platformAccount.platform]),
-    Buffer.from(iv)
-  );
-  const cipherPhrase = Buffer.concat([
-    cipher.update(newPassword),
-    cipher.final(),
-  ]).toString('hex');
+//   const iv = rdmString({
+//     length: 16,
+//     speSelect: true,
+//   });
+//   const cipher = crypto.createCipheriv(
+//     config.cipher.algorithm,
+//     Buffer.from(config.cipher[platformAccount.platform]),
+//     Buffer.from(iv)
+//   );
+//   const cipherPhrase = Buffer.concat([
+//     cipher.update(newPassword),
+//     cipher.final(),
+//   ]).toString('hex');
 
-  const sql = `
-    UPDATE platform_accounts
-    SET
-      password = '${newPassword}',
-      iv = '${iv}',
-      cipher = '${cipherPhrase}',
-      updated_at = current_timestamp()
-    WHERE
-      platform_accounts.id = '${platformAccount.id}'
-    ;
-  `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
-  if (insertResult.affectedRows !== 1) {
-    throw new AppError(CErrors.processing);
-  }
+//   const sql = `
+//     UPDATE platform_accounts
+//     SET
+//       password = '${newPassword}',
+//       iv = '${iv}',
+//       cipher = '${cipherPhrase}',
+//       updated_at = current_timestamp()
+//     WHERE
+//       platform_accounts.id = '${platformAccount.id}'
+//     ;
+//   `;
+//   const insertResult = await SqlService.sendSqlRequest(req, sql);
+//   if (insertResult.affectedRows !== 1) {
+//     throw new AppError(CErrors.processing);
+//   }
 
-  const result = getPlatformAccountFromId(req, platformAccount.id);
+//   const result = getPlatformAccountFromId(req, platformAccount.id);
 
-  return result;
-};
+//   return result;
+// };
 
-export const unsubscribePlatformAccount = async (
-  req: Request,
-  platformAccount: PlatformAccountSQL
-): Promise<PlatformAccountSQL> => {
-  // Set function name for logs
-  const functionName = (i: number) =>
-    'services/database.ts : unsubscribePlatformAccount ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const unsubscribePlatformAccount = async (
+//   req: Request,
+//   platformAccount: PlatformAccountSQL
+// ): Promise<PlatformAccountSQL> => {
+//   // Set function name for logs
+//   const functionName = (i: number) =>
+//     'services/database.ts : unsubscribePlatformAccount ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `
-    UPDATE platform_accounts
-    SET
-      subscribed = '0',
-      updated_at = current_timestamp(),
-      deleted_at = NULL
-    WHERE
-      platform_accounts.id = '${platformAccount.id}'
-    ;
-  `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
-  if (insertResult.affectedRows !== 1) {
-    throw new AppError(CErrors.processing);
-  }
+//   const sql = `
+//     UPDATE platform_accounts
+//     SET
+//       subscribed = '0',
+//       updated_at = current_timestamp(),
+//       deleted_at = NULL
+//     WHERE
+//       platform_accounts.id = '${platformAccount.id}'
+//     ;
+//   `;
+//   const insertResult = await SqlService.sendSqlRequest(req, sql);
+//   if (insertResult.affectedRows !== 1) {
+//     throw new AppError(CErrors.processing);
+//   }
 
-  const result = getPlatformAccountFromId(req, platformAccount.id);
+//   const result = getPlatformAccountFromId(req, platformAccount.id);
 
-  return result;
-};
+//   return result;
+// };
 
-export const getAllPlatformAccount = async (
-  req: Request
-): Promise<PlatformAccountSQL[]> => {
-  // Set function name for logs
-  const functionName = (i: number) =>
-    'services/database.ts : getAllPlatformAccount ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const getAllPlatformAccount = async (
+//   req: Request
+// ): Promise<PlatformAccountSQL[]> => {
+//   // Set function name for logs
+//   const functionName = (i: number) =>
+//     'services/database.ts : getAllPlatformAccount ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `
-    SELECT
-      ${columnsGettable}
-    FROM platform_accounts
-    ;
-  `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+//   const sql = `
+//     SELECT
+//       ${columnsGettable}
+//     FROM platform_accounts
+//     ;
+//   `;
+//   const result = await SqlService.sendSqlRequest(req, sql);
 
-  return result.map((e: PlatformAccountSQL[]) => ({
-    ...e,
-    password: undefined,
-    iv: undefined,
-    cipher: undefined,
-  }));
-};
+//   return result.map((e: PlatformAccountSQL[]) => ({
+//     ...e,
+//     password: undefined,
+//     iv: undefined,
+//     cipher: undefined,
+//   }));
+// };
 
 export const getPlatformAccountsAvailable = async (
   req: Request,
@@ -338,115 +337,115 @@ export const getPlatformAccountsAvailable = async (
   return result;
 };
 
-export const getAllPlatformAccountActive = async (
-  req: Request
-): Promise<PlatformAccountSQL[]> => {
-  // Set function name for logs
-  const functionName = (i: number) =>
-    'services/database.ts : getAllPlatformAccountActive ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const getAllPlatformAccountActive = async (
+//   req: Request
+// ): Promise<PlatformAccountSQL[]> => {
+//   // Set function name for logs
+//   const functionName = (i: number) =>
+//     'services/database.ts : getAllPlatformAccountActive ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  const sql = `
-    SELECT
-      ${columnsGettable}
-    FROM platform_accounts
-    WHERE
-      active = TRUE
-    ;
-  `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+//   const sql = `
+//     SELECT
+//       ${columnsGettable}
+//     FROM platform_accounts
+//     WHERE
+//       active = TRUE
+//     ;
+//   `;
+//   const result = await SqlService.sendSqlRequest(req, sql);
 
-  return result.map((e: PlatformAccountSQL[]) => ({
-    ...e,
-    password: undefined,
-    iv: undefined,
-    cipher: undefined,
-  }));
-};
+//   return result.map((e: PlatformAccountSQL[]) => ({
+//     ...e,
+//     password: undefined,
+//     iv: undefined,
+//     cipher: undefined,
+//   }));
+// };
 
-export const desactivationPlatformAccount = async (
-  req: Request
-): Promise<PlatformAccountSQL[]> => {
-  // Set function name for logs
-  const functionName = (i: number) =>
-    'services/database.ts : desactivationPlatformAccount ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const desactivationPlatformAccount = async (
+//   req: Request
+// ): Promise<PlatformAccountSQL[]> => {
+//   // Set function name for logs
+//   const functionName = (i: number) =>
+//     'services/database.ts : desactivationPlatformAccount ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  let sql;
+//   let sql;
 
-  // Get lines to change
-  sql = `
-    SELECT id
-    FROM platform_accounts
-    WHERE
-      active = TRUE &&
-      DATEDIFF(date_end, NOW()) < 3
-    ;
-  `;
-  const lines: PlatformAccountSQL[] = await SqlService.sendSqlRequest(req, sql);
-  Logger.info({ functionName: functionName(1), lines: lines.length }, req);
-  if (lines.length === 0) {
-    return [];
-  }
+//   // Get lines to change
+//   sql = `
+//     SELECT id
+//     FROM platform_accounts
+//     WHERE
+//       active = TRUE &&
+//       DATEDIFF(date_end, NOW()) < 3
+//     ;
+//   `;
+//   const lines: PlatformAccountSQL[] = await SqlService.sendSqlRequest(req, sql);
+//   Logger.info({ functionName: functionName(1), lines: lines.length }, req);
+//   if (lines.length === 0) {
+//     return [];
+//   }
 
-  // Change lines
-  sql = `
-    UPDATE platform_accounts
-    SET
-      active = FALSE,
-      updated_at = current_timestamp()
-    WHERE
-      id IN (${lines.map((e) => "'" + e.id + "'")})
-    ;
-  `;
-  const linesChanged = (await SqlService.sendSqlRequest(req, sql)).affectedRows;
-  Logger.info(
-    { functionName: functionName(2), linesChanged: linesChanged },
-    req
-  );
+//   // Change lines
+//   sql = `
+//     UPDATE platform_accounts
+//     SET
+//       active = FALSE,
+//       updated_at = current_timestamp()
+//     WHERE
+//       id IN (${lines.map((e) => "'" + e.id + "'")})
+//     ;
+//   `;
+//   const linesChanged = (await SqlService.sendSqlRequest(req, sql)).affectedRows;
+//   Logger.info(
+//     { functionName: functionName(2), linesChanged: linesChanged },
+//     req
+//   );
 
-  // Get lines changed
-  sql = `
-    SELECT
-      ${columnsGettable}
-    FROM platform_accounts
-    WHERE
-      id IN (${lines.map((e) => "'" + e.id + "'")})
-    ;
-  `;
-  const result = await SqlService.sendSqlRequest(req, sql);
-  Logger.info({ functionName: functionName(3), result: result.length }, req);
+//   // Get lines changed
+//   sql = `
+//     SELECT
+//       ${columnsGettable}
+//     FROM platform_accounts
+//     WHERE
+//       id IN (${lines.map((e) => "'" + e.id + "'")})
+//     ;
+//   `;
+//   const result = await SqlService.sendSqlRequest(req, sql);
+//   Logger.info({ functionName: functionName(3), result: result.length }, req);
 
-  return result;
-};
+//   return result;
+// };
 
-export const platformAccountToUnsub = async (
-  req: Request
-): Promise<PlatformAccountSQL[]> => {
-  // Set function name for logs
-  const functionName = (i: number) =>
-    'services/database.ts : platformAccountToUnsub ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+// export const platformAccountToUnsub = async (
+//   req: Request
+// ): Promise<PlatformAccountSQL[]> => {
+//   // Set function name for logs
+//   const functionName = (i: number) =>
+//     'services/database.ts : platformAccountToUnsub ' + i;
+//   Logger.info({ functionName: functionName(0) }, req);
 
-  let sql;
+//   let sql;
 
-  // Get lines to change
-  sql = `
-    SELECT id, email, platform
-    FROM platform_accounts
-    WHERE
-      subscribed = TRUE &&
-      DATEDIFF(date_end, NOW()) < 2
-    ;
-  `;
-  const lines: PlatformAccountSQL[] = await SqlService.sendSqlRequest(req, sql);
-  Logger.info({ functionName: functionName(1), lines: lines.length }, req);
-  if (lines.length === 0) {
-    return [];
-  }
+//   // Get lines to change
+//   sql = `
+//     SELECT id, email, platform
+//     FROM platform_accounts
+//     WHERE
+//       subscribed = TRUE &&
+//       DATEDIFF(date_end, NOW()) < 2
+//     ;
+//   `;
+//   const lines: PlatformAccountSQL[] = await SqlService.sendSqlRequest(req, sql);
+//   Logger.info({ functionName: functionName(1), lines: lines.length }, req);
+//   if (lines.length === 0) {
+//     return [];
+//   }
 
-  return lines;
-};
+//   return lines;
+// };
 
 // export const platformAccountGetBadPasswords = async (
 //   req: Request
@@ -477,18 +476,18 @@ export const platformAccountToUnsub = async (
 // };
 
 export default {
-  getPlatformAccountFromId,
+  // getPlatformAccountFromId,
   getPlatformAccountFromEmail,
   getPlatformAccountPassword,
   createPlatformAccount,
-  updatePlatformAccountPassword,
-  unsubscribePlatformAccount,
-  getAllPlatformAccount,
-  getAllPlatformAccountActive,
-  desactivationPlatformAccount,
-  platformAccountToUnsub,
-  getPlatformAccountsFromIds,
-  getPlatformAccountsFromEmails,
+  // updatePlatformAccountPassword,
+  // unsubscribePlatformAccount,
+  // getAllPlatformAccount,
+  // getAllPlatformAccountActive,
+  // desactivationPlatformAccount,
+  // platformAccountToUnsub,
+  // getPlatformAccountsFromIds,
+  // getPlatformAccountsFromEmails,
   // platformAccountGetBadPasswords,
   getPlatformAccountsAvailable,
 };

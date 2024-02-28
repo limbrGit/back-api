@@ -336,7 +336,7 @@ const resetPassword = async (req: Request): Promise<Object> => {
   const userUpdated: UserSQL = await UserService.changePasswordUserSQL(
     req,
     user,
-    password,
+    // password,
     salt,
     hash
   );

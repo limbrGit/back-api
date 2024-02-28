@@ -13,7 +13,7 @@ export interface Subs {
 export interface User {
   id?: string;
   email: string;
-  password?: string;
+  // password?: string;
   username: string;
   tokens: number;
   token_end_date: number | string | null;
