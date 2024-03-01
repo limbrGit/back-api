@@ -84,7 +84,10 @@ const config: Config = {
   },
 
   notifications: {
+    logoUrl: process.env.NOTIFICATIONS_LOGO_URL!,
     webhookTeams: process.env.NOTIFICATIONS_WEBHOOK_TEAMS!,
+    webhookDiscordAlert: process.env.NOTIFICATIONS_WEBHOOK_DISCORD_ALERT!,
+    webhookDiscordLog: process.env.NOTIFICATIONS_WEBHOOK_DISCORD_LOG!,
   },
 };
 

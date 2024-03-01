@@ -67,7 +67,10 @@ export interface Vivawallet {
 }
 
 export interface Notifications {
+  logoUrl: string;
   webhookTeams: string;
+  webhookDiscordAlert: string;
+  webhookDiscordLog: string;
 }
 
 export interface Config {

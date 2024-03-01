@@ -1,6 +1,7 @@
 // Imports
 import { Request } from 'express';
 import fetch from 'node-fetch';
+import dayjs from 'dayjs';
 
 // Config
 import config from '../configs/config';
@@ -8,11 +9,7 @@ import config from '../configs/config';
 // Tools
 import Logger from '../tools/logger';
 
-const sendNotification = async (data: any, req?: Request) => {
-  const functionName = (i: number) =>
-    'tools/notifications.ts : sendNotification ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
-
+const notificationTeams = async (data: any, req?: Request) => {
   await fetch(config.notifications.webhookTeams, {
     method: 'POST',
     headers: {
@@ -94,6 +91,70 @@ const sendNotification = async (data: any, req?: Request) => {
       ],
     }),
   });
+};
+
+const notificationDiscord = async (data: any, req?: Request) => {
+  const dataJson =
+    typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
+
+  const codeError =
+    dataJson.code && dataJson.code >= 500 && dataJson.code < 600;
+
+  // Tuto : https://gist.github.com/Birdie0/78ee79402a4301b1faf412ab5f1cdcf9
+  await fetch(
+    codeError
+      ? config.notifications.webhookDiscordAlert
+      : config.notifications.webhookDiscordLog,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      redirect: 'follow',
+      body: JSON.stringify({
+        content: `Bonjour${
+          codeError ? ' <@&1211990689202569226>' : ''
+        }, un service a eu une erreur :`,
+        username: 'Alerte ' + config.env,
+        avatar_url: config.notifications.logoUrl,
+        embeds: [
+          {
+            title: 'Service : ' + config.serverName,
+            timestamp: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
+            fields: [
+              {
+                name: 'Environement',
+                value: config.env,
+              },
+              {
+                name: 'Execution ID',
+                value: req?.headers?.executionId,
+              },
+              {
+                name: 'Message',
+                value: data.message,
+              },
+              {
+                name: 'Data',
+                value: JSON.stringify(dataJson),
+              },
+            ],
+          },
+        ],
+      }),
+    }
+  );
+};
+
+const sendNotification = async (data: any, req?: Request) => {
+  const functionName = (i: number) =>
+    'tools/notifications.ts : sendNotification ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  await Promise.all([
+    notificationTeams(data, req),
+    notificationDiscord(data, req),
+  ]);
 };
 
 export default {
