@@ -151,7 +151,7 @@ const create = async (req: Request): Promise<User> => {
   const result = await UserService.createUserSQL(req, userSQL);
 
   // send mail
-  await SendMails.sendCodeMail(req, result);
+  // await SendMails.sendCodeMail(req, result);
 
   return { id: result.id, email: result.email, username: result.username };
 };
