@@ -26,7 +26,7 @@ paymentApis.get(
       res.json(result);
     } catch (error) {
       Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
+        { message: 'Error on : ' + functionName, data: error, alerte: true },
         req
       );
       next(error);
@@ -46,7 +46,7 @@ paymentApis.post(
       res.json(result);
     } catch (error) {
       Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
+        { message: 'Error on : ' + functionName, data: error, alerte: true },
         req
       );
       next(error);

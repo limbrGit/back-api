@@ -113,7 +113,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   if (user.deleted_at) {
     throw new AppError(CErrors.userDeleted);
   }
-  Logger.info({ functionName: functionName(0), a: 'AAA' }, req);
+  Logger.info({ functionName: functionName(1) }, req);
 
   // Get transaction
   let transaction: PaymentTransactionSQL =
@@ -128,7 +128,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.transactionOver);
   }
 
-  Logger.info({ functionName: functionName(0), a: 'BBB' }, req);
+  Logger.info({ functionName: functionName(2) }, req);
   // Check Vivawallet payment order
   const vivawalletPaymentOrder =
     await VivawalletService.getPaymentOrderFromOrderCode(req, transaction);
@@ -136,7 +136,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.vivawalletGetPaymentOrder);
   }
 
-  Logger.info({ functionName: functionName(0), a: 'CCC' }, req);
+  Logger.info({ functionName: functionName(3) }, req);
   // Get new status
   const getNewStatus = (stateId: number): PaymentTransactionStatus => {
     if (stateId === 0) {
@@ -152,7 +152,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   };
   const newStatus = getNewStatus(vivawalletPaymentOrder.StateId);
 
-  Logger.info({ functionName: functionName(0), a: 'DDD' }, req);
+  Logger.info({ functionName: functionName(4) }, req);
   // If transaction is paid
   if (newStatus === PaymentTransactionStatus.Paid) {
     // Get offer
@@ -164,20 +164,22 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       throw new AppError(CErrors.offerNotFound);
     }
 
-    Logger.info({ functionName: functionName(0), a: 'EEE' }, req);
+    Logger.info({ functionName: functionName(5) }, req);
     // Update user in DB with new tokens
     user = await UserService.updateUserSQL(req, {
       ...user,
       birthdate: undefined,
       tokens: user.tokens + offer.tokens,
-      token_end_date: dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss'),
+      token_end_date: user.token_end_date
+        ? dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss')
+        : null,
     });
     if (!user) {
       throw new AppError(CErrors.getUser);
     }
   }
 
-  Logger.info({ functionName: functionName(0), a: 'FFF' }, req);
+  Logger.info({ functionName: functionName(6) }, req);
   // Update transaction
   transaction = await PaymentTransactionService.updatePaymentTransactionSQL(
     req,
@@ -186,7 +188,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       status: newStatus,
     }
   );
-  Logger.info({ functionName: functionName(0), a: 'GGG' }, req);
+  Logger.info({ functionName: functionName(7) }, req);
 
   // Return temporary just to send the link
   return transaction;

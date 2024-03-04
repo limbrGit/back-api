@@ -97,9 +97,9 @@ const notificationDiscord = async (data: any, req?: Request) => {
   const dataJson =
     typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
 
-  const codeError = dataJson.code
+  const codeError = (dataJson.code
     ? dataJson.code >= 500 && dataJson.code < 600
-    : dataJson.toString() !== '[object Object]';
+    : dataJson.toString() !== '[object Object]') || data.alerte;
 
   // Tuto : https://gist.github.com/Birdie0/78ee79402a4301b1faf412ab5f1cdcf9
   await fetch(

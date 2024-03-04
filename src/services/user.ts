@@ -160,7 +160,7 @@ export const createUserSQL = async (
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id);
+  const result = getUserFromIdSQL(req, userSQL.id!);
 
   return result;
 };
@@ -196,7 +196,7 @@ export const updateUserSQL = async (
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id);
+  const result = getUserFromIdSQL(req, userSQL.id!);
 
   return result;
 };
@@ -227,7 +227,7 @@ export const changePasswordUserSQL = async (
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id);
+  const result = getUserFromIdSQL(req, userSQL.id!);
 
   return result;
 };
@@ -253,7 +253,7 @@ export const valideConfirmationCode = async (
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id);
+  const result = getUserFromIdSQL(req, userSQL.id!);
 
   return result;
 };
