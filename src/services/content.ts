@@ -1,6 +1,7 @@
 // Imports
 import { Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import {
@@ -82,7 +83,7 @@ const gettableCatalogLinks = [
   // 'episode_id',
   'platform',
   'link',
-  'available'
+  'available',
 ];
 
 const gettableCatalogEpisodes = [
@@ -96,7 +97,8 @@ const gettableCatalogEpisodes = [
 export const getRatingsFromId = async (
   req: Request,
   id: number | string,
-  selectionner: string
+  selectionner: string,
+  pool: Connection | null = null
 ): Promise<Rating[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -114,7 +116,12 @@ export const getRatingsFromId = async (
       catalog_ratings.${selectionner}_id = ?
     ;
   `;
-  const ratings: Rating[] = await SqlService.sendSqlRequest(req, sql, [id]);
+  const ratings: Rating[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [id],
+    pool
+  );
 
   return ratings;
 };
@@ -122,7 +129,8 @@ export const getRatingsFromId = async (
 export const getPicturesFromId = async (
   req: Request,
   id: number | string,
-  selectionner: string
+  selectionner: string,
+  pool: Connection | null = null
 ): Promise<Picture[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -140,14 +148,20 @@ export const getPicturesFromId = async (
       catalog_pictures.${selectionner}_id = ?
     ;
   `;
-  const pictures: Picture[] = await SqlService.sendSqlRequest(req, sql, [id]);
+  const pictures: Picture[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [id],
+    pool
+  );
 
   return pictures;
 };
 
 export const getCastsFromId = async (
   req: Request,
-  id: number
+  id: number,
+  pool: Connection | null = null
 ): Promise<Cast[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -165,7 +179,7 @@ export const getCastsFromId = async (
       catalog_casts.content_id = ?
     ;
   `;
-  const casts: Cast[] = await SqlService.sendSqlRequest(req, sql, [id]);
+  const casts: Cast[] = await SqlService.sendSqlRequest(req, sql, [id], pool);
 
   return casts;
 };
@@ -173,7 +187,8 @@ export const getCastsFromId = async (
 export const getLinksFromId = async (
   req: Request,
   id: number | string,
-  selectionner: string
+  selectionner: string,
+  pool: Connection | null = null
 ): Promise<Link[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -192,7 +207,7 @@ export const getLinksFromId = async (
       AND catalog_links.available = TRUE
     ;
   `;
-  const links: Link[] = await SqlService.sendSqlRequest(req, sql, [id]);
+  const links: Link[] = await SqlService.sendSqlRequest(req, sql, [id], pool);
 
   return links;
 };
@@ -200,7 +215,8 @@ export const getLinksFromId = async (
 export const getEpisodesFromId = async (
   req: Request,
   id: number | string,
-  selectionner: string
+  selectionner: string,
+  pool: Connection | null = null
 ): Promise<Episode[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -232,9 +248,12 @@ export const getEpisodesFromId = async (
       catalog_episodes.${selectionner}_id = ?
     ;
   `;
-  const episodes: EpisodeSQL[] = await SqlService.sendSqlRequest(req, sql, [
-    id,
-  ]);
+  const episodes: EpisodeSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [id],
+    pool
+  );
 
   for (let i = 0; i < episodes.length; i++) {
     const episode = episodes[i];
@@ -256,11 +275,17 @@ export const getEpisodesFromId = async (
     episode.pictures = await getPicturesFromId(
       req,
       episode.episode_id,
-      'episode'
+      'episode',
+      pool
     );
 
     // Get links info
-    episode.links = await getLinksFromId(req, episode.episode_id, 'episode');
+    episode.links = await getLinksFromId(
+      req,
+      episode.episode_id,
+      'episode',
+      pool
+    );
   }
 
   return episodes;
@@ -268,7 +293,8 @@ export const getEpisodesFromId = async (
 
 export const getContentFromContentId = async (
   req: Request,
-  contentId: number
+  contentId: number,
+  pool: Connection | null = null
 ): Promise<Content | null> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -300,7 +326,7 @@ export const getContentFromContentId = async (
     ;
   `;
   const content: ContentSQL = (
-    await SqlService.sendSqlRequest(req, sql, [contentId])
+    await SqlService.sendSqlRequest(req, sql, [contentId], pool)
   )[0];
 
   if (!content) {
@@ -328,20 +354,22 @@ export const getContentFromContentId = async (
   const pictures: Picture[] = await getPicturesFromId(
     req,
     contentId,
-    'content'
+    'content',
+    pool
   );
 
   // Get casts info
-  const casts: Cast[] = await getCastsFromId(req, contentId);
+  const casts: Cast[] = await getCastsFromId(req, contentId, pool);
 
   // Get links info
-  const links: Link[] = await getLinksFromId(req, contentId, 'content');
+  const links: Link[] = await getLinksFromId(req, contentId, 'content', pool);
 
   // Get episodes info
   const episodes: Episode[] = await getEpisodesFromId(
     req,
     contentId,
-    'content'
+    'content',
+    pool
   );
 
   return {

@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { UserSQL } from '../interfaces/user';
@@ -39,7 +40,10 @@ const columnsGettable = `
   deleted_at
 `;
 
-export const getAllUserSQL = async (req: Request): Promise<UserSQL[]> => {
+export const getAllUserSQL = async (
+  req: Request,
+  pool: Connection | null = null
+): Promise<UserSQL[]> => {
   const functionName = (i: number) => 'services/user.ts : getAllUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
@@ -49,14 +53,15 @@ export const getAllUserSQL = async (req: Request): Promise<UserSQL[]> => {
     FROM users
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result;
 };
 
 export const getUserFromUsernameSQL = async (
   req: Request,
-  username: string
+  username: string,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
   const functionName = (i: number) =>
     'services/user.ts : getUserFromUsernameSQL ' + i;
@@ -71,14 +76,15 @@ export const getUserFromUsernameSQL = async (
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result[0];
 };
 
 export const getUserFromEmailSQL = async (
   req: Request,
-  email: string
+  email: string,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
   const functionName = (i: number) =>
     'services/user.ts : getUserFromEmailSQL ' + i;
@@ -93,14 +99,15 @@ export const getUserFromEmailSQL = async (
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result[0];
 };
 
 export const getUserFromIdSQL = async (
   req: Request,
-  id: string
+  id: string,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
   const functionName = (i: number) =>
     'services/user.ts : getUserFromIdSQL ' + i;
@@ -115,14 +122,15 @@ export const getUserFromIdSQL = async (
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result[0];
 };
 
 export const createUserSQL = async (
   req: Request,
-  userSQL: UserSQL
+  userSQL: UserSQL,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
   const functionName = (i: number) => 'services/user.ts : createUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
@@ -155,19 +163,20 @@ export const createUserSQL = async (
       NULL
     );
   `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id!);
+  const result = getUserFromIdSQL(req, userSQL.id!, pool);
 
   return result;
 };
 
 export const updateUserSQL = async (
   req: Request,
-  userSQL: UserSQL
+  userSQL: UserSQL,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
   const functionName = (i: number) => 'services/user.ts : updateUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
@@ -176,14 +185,26 @@ export const updateUserSQL = async (
     UPDATE users
     SET
       username = '${userSQL.username}',
-      ${userSQL.tokens ? "tokens = " + userSQL.tokens + "," : ''}
-      ${userSQL.token_end_date ? "token_end_date = '" + userSQL.token_end_date + "'," : ''}
+      ${userSQL.tokens ? 'tokens = ' + userSQL.tokens + ',' : ''}
+      ${
+        userSQL.token_end_date
+          ? "token_end_date = '" + userSQL.token_end_date + "',"
+          : ''
+      }
       ${userSQL.firstname ? "firstname = '" + userSQL.firstname + "'," : ''}
       ${userSQL.lastname ? "lastname = '" + userSQL.lastname + "'," : ''}
       ${userSQL.birthdate ? "birthdate = '" + userSQL.birthdate + "'," : ''}
       ${userSQL.gender ? "gender = '" + userSQL.gender + "'," : ''}
-      ${userSQL.description ? "description = '" + userSQL.description + "'," : ''}
-      ${typeof userSQL.picture === "number" ? "picture = " + userSQL.picture + "," : ''}
+      ${
+        userSQL.description
+          ? "description = '" + userSQL.description + "',"
+          : ''
+      }
+      ${
+        typeof userSQL.picture === 'number'
+          ? 'picture = ' + userSQL.picture + ','
+          : ''
+      }
       ${userSQL.subs ? "subs = '" + userSQL.subs + "'," : ''}
       updated_at = NOW()
     WHERE
@@ -191,12 +212,12 @@ export const updateUserSQL = async (
   `;
   Logger.info({ functionName: functionName(1), sql }, req);
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id!);
+  const result = getUserFromIdSQL(req, userSQL.id!, pool);
 
   return result;
 };
@@ -206,9 +227,10 @@ export const changePasswordUserSQL = async (
   userSQL: UserSQL,
   // password: string,
   salt: string,
-  hash: string
+  hash: string,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
-  const functionName = (i: number) => 'services/user.ts : updateUserSQL ' + i;
+  const functionName = (i: number) => 'services/user.ts : changePasswordUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -222,19 +244,20 @@ export const changePasswordUserSQL = async (
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id!);
+  const result = getUserFromIdSQL(req, userSQL.id!, pool);
 
   return result;
 };
 
 export const valideConfirmationCode = async (
   req: Request,
-  userSQL: UserSQL
+  userSQL: UserSQL,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
   const functionName = (i: number) =>
     'services/user.ts : valideConfirmationCode ' + i;
@@ -248,22 +271,22 @@ export const valideConfirmationCode = async (
   WHERE
     users.id = '${userSQL.id}';
   `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userSQL.id!);
+  const result = getUserFromIdSQL(req, userSQL.id!, pool);
 
   return result;
 };
 
 export const deleteUserSQL = async (
   req: Request,
-  userId: string
+  userId: string,
+  pool: Connection | null = null
 ): Promise<UserSQL> => {
-  const functionName = (i: number) =>
-    'services/user.ts : deleteUserSQL ' + i;
+  const functionName = (i: number) => 'services/user.ts : deleteUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -278,16 +301,15 @@ export const deleteUserSQL = async (
   WHERE
     users.id = '${userId}';
   `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getUserFromIdSQL(req, userId);
+  const result = getUserFromIdSQL(req, userId, pool);
 
   return result;
 };
-
 
 export default {
   getAllUserSQL,
@@ -298,5 +320,5 @@ export default {
   updateUserSQL,
   changePasswordUserSQL,
   valideConfirmationCode,
-  deleteUserSQL
+  deleteUserSQL,
 };

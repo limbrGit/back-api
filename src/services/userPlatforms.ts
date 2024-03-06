@@ -1,6 +1,7 @@
 // Imports
 import { Request } from 'express';
 import fetch from 'node-fetch';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { UserSQL } from '../interfaces/user';
@@ -33,11 +34,18 @@ const columnsGettable = `
   deleted_at
 `;
 
+interface GetUserPlatformsFromUserSQL {
+  user: UserSQL;
+  active?: boolean;
+  pool?: Connection | null
+}
+
 export const getUserPlatformsFromUserSQL = async (
   req: Request,
-  user: UserSQL,
-  active: boolean = true
+  data: GetUserPlatformsFromUserSQL
 ): Promise<UserPlatformSQL[]> => {
+  const { user, active = true, pool = null } = data;
+
   const functionName = (i: number) =>
     'services/userPlatforms.ts : getUserPlatformsFromUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
@@ -59,18 +67,28 @@ export const getUserPlatformsFromUserSQL = async (
       AND users_platforms.deleted_at IS NULL
     ;
   `;
-  const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(req, sql, [
-    user.email,
-  ]);
+  const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [user.email],
+    pool
+  );
 
   return result;
 };
 
+interface GetUserPlatformsFromPlatformSQL {
+  platformAccount: PlatformAccountSQL;
+  active?: boolean;
+  pool?: Connection | null
+}
+
 export const getUserPlatformsFromPlatformSQL = async (
   req: Request,
-  platformAccount: PlatformAccountSQL,
-  active: boolean = true
+  data: GetUserPlatformsFromPlatformSQL
 ): Promise<UserPlatformSQL[]> => {
+  const { platformAccount, active = true, pool = null } = data;
+
   const functionName = (i: number) =>
     'services/userPlatforms.ts : getUserPlatformsFromPlatformSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
@@ -92,21 +110,31 @@ export const getUserPlatformsFromPlatformSQL = async (
       AND users_platforms.deleted_at IS NULL
     ;
   `;
-  const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(req, sql, [
-    platformAccount.email,
-  ]);
+  const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [platformAccount.email],
+    pool
+  );
 
   return result;
 };
 
+interface GetUserPlatformsFromUserAndPlatformSQL {
+  user: UserSQL;
+  platformAccount: PlatformAccountSQL;
+  active?: boolean;
+  pool?: Connection | null
+}
+
 export const getUserPlatformsFromUserAndPlatformSQL = async (
   req: Request,
-  user: UserSQL,
-  platformAccount: PlatformAccountSQL,
-  active: boolean = true
+  data: GetUserPlatformsFromUserAndPlatformSQL
 ): Promise<UserPlatformSQL[]> => {
+  const { user, platformAccount, active = true, pool = null } = data;
+
   const functionName = (i: number) =>
-    'services/userPlatforms.ts : getUserPlatformsFromPlatformSQL ' + i;
+    'services/userPlatforms.ts : getUserPlatformsFromUserAndPlatformSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -127,10 +155,12 @@ export const getUserPlatformsFromUserAndPlatformSQL = async (
       AND users_platforms.deleted_at IS NULL
     ;
   `;
-  const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(req, sql, [
-    user.email,
-    platformAccount.email,
-  ]);
+  const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [user.email, platformAccount.email],
+    pool
+  );
 
   return result;
 };
@@ -139,7 +169,8 @@ export const createUserPlatformsSQL = async (
   req: Request,
   user: UserSQL,
   platformAccount: PlatformAccountSQL,
-  endDate: string
+  endDate: string,
+  pool: Connection | null = null
 ): Promise<UserPlatformSQL> => {
   const functionName = (i: number) =>
     'services/list.ts : createUserPlatformsSQL ' + i;
@@ -169,17 +200,22 @@ export const createUserPlatformsSQL = async (
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql, [
-    user.email,
-    platformAccount.email,
-    endDate,
-  ]);
+  const insertResult = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [user.email, platformAccount.email, endDate],
+    pool
+  );
   if (insertResult.affectedRows === 0) {
     throw new AppError(CErrors.processing);
   }
 
   const result: UserPlatformSQL[] =
-    await getUserPlatformsFromUserAndPlatformSQL(req, user, platformAccount);
+    await getUserPlatformsFromUserAndPlatformSQL(req, {
+      user,
+      platformAccount,
+      pool,
+    });
 
   return result[0];
 };
@@ -190,7 +226,7 @@ export const getUserPlatformOtp = async (
   startTimer: string
 ): Promise<{ digit: string }> => {
   const functionName = (i: number) =>
-    'services/list.ts : createUserPlatformsSQL ' + i;
+    'services/list.ts : getUserPlatformOtp ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   // Create account

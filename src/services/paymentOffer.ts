@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { PaymentOfferSQL, PaymentOfferName } from '../interfaces/paymentOffer';
@@ -22,7 +23,8 @@ const columnsGettable = `
 
 export const getPaymentOfferFromIdSQL = async (
   req: Request,
-  paymentOfferName: PaymentOfferName
+  paymentOfferName: PaymentOfferName,
+  pool: Connection | null = null
 ): Promise<PaymentOfferSQL> => {
   const functionName = (i: number) =>
     'services/paymentOffer.ts : getPaymentOfferFromIdSQL ' + i;
@@ -41,7 +43,8 @@ export const getPaymentOfferFromIdSQL = async (
   const result: PaymentOfferSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    []
+    [],
+    pool
   );
 
   return result[0];

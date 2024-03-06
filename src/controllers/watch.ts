@@ -8,6 +8,7 @@ import { PlatformAccountSQL, PlatformInfoSQL } from '../interfaces/database';
 
 // Tools
 import Logger from '../tools/logger';
+import { wait } from '../tools/strings';
 
 // Constants
 import CErrors from '../constants/errors';
@@ -15,18 +16,25 @@ import CErrors from '../constants/errors';
 // Classes
 import AppError from '../classes/AppError';
 
+// Config
+import config from '../configs/config';
+
 // Services
 import UserService from '../services/user';
 import PlatformInfoService from '../services/platformInfo';
 import PlatformAccountService from '../services/platformAccount';
 import ContentService from '../services/content';
 import UserPlatformService from '../services/userPlatforms';
+import SqlService from '../services/sql';
 
-const startWatchContent = async (req: Request): Promise<Link> => {
+const startWatchContent = async (
+  req: Request,
+  iteration: number = 0
+): Promise<Link> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'controller/list.ts : startWatchContent ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+  Logger.info({ functionName: functionName(0), iteration: iteration }, req);
 
   const { type, id } = req.params;
 
@@ -39,8 +47,16 @@ const startWatchContent = async (req: Request): Promise<Link> => {
   }
   Logger.info({ functionName: functionName(1), type: type, id: id }, req);
 
+  // If it is the 4th try, we throw an error
+  if (iteration > 2) {
+    throw new AppError(CErrors.createPlatformAccountError);
+  }
+
+  // Create pool connection
+  const pool = await SqlService.createPool(req);
+
   // Check user
-  const user = await UserService.getUserFromIdSQL(req, req?.user?.id);
+  const user = await UserService.getUserFromIdSQL(req, req?.user?.id, pool);
   if (!user) {
     throw new AppError(CErrors.userNotFound);
   }
@@ -49,15 +65,20 @@ const startWatchContent = async (req: Request): Promise<Link> => {
   }
 
   // Check if user have a current token
-  if (!user.token_end_date || (user.token_end_date as number) < Date.now()) {
-    throw new AppError(CErrors.noCurrentToken);
-  }
+  // if (!user.token_end_date || (user.token_end_date as number) < Date.now()) {
+  //   throw new AppError(CErrors.noCurrentToken);
+  // }
 
   // Get content or episode
   const content =
     type === 'content'
-      ? await ContentService.getContentFromContentId(req, parseInt(id))
-      : await ContentService.getEpisodesFromId(req, parseInt(id), 'episode');
+      ? await ContentService.getContentFromContentId(req, parseInt(id), pool)
+      : await ContentService.getEpisodesFromId(
+          req,
+          parseInt(id),
+          'episode',
+          pool
+        );
   if (!content) {
     throw new AppError(CErrors.contentNotFound);
   }
@@ -69,7 +90,8 @@ const startWatchContent = async (req: Request): Promise<Link> => {
     const link = element.links[i];
     const platformInfo = await PlatformInfoService.getPlatformInfoFromName(
       req,
-      link.platform
+      link.platform,
+      pool
     );
     platformInfos.push({
       ...platformInfo,
@@ -80,7 +102,7 @@ const startWatchContent = async (req: Request): Promise<Link> => {
   // Get user platforms
   const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
     req,
-    user
+    { user, pool }
   );
 
   // Check if there is no user platform available for this content
@@ -89,12 +111,13 @@ const startWatchContent = async (req: Request): Promise<Link> => {
   );
 
   //! If the user already have a platform account used with this content
-  if (platformAlreadyUsed) {
+  if (platformAlreadyUsed && false) {
     // Get platform account
     const platformAccount =
       await PlatformAccountService.getPlatformAccountFromEmail(
         req,
-        platformAlreadyUsed?.platform_account_email!
+        platformAlreadyUsed?.platform_account_email!,
+        pool
       );
 
     // Return link and platform
@@ -117,13 +140,14 @@ const startWatchContent = async (req: Request): Promise<Link> => {
   const platformAccountsAvailables =
     await PlatformAccountService.getPlatformAccountsAvailable(
       req,
-      platformInfos.map((e) => e.name)
+      platformInfos.map((e) => e.name),
+      pool
     );
 
   // Logger.info({ functionName: functionName(1), platformInfos: platformInfos.map((e) => e.name) }, req);
   // Logger.info({ functionName: functionName(1), platformAccountsAvailables }, req);
   //! Find the platform with the less place
-  if (platformAccountsAvailables.length > 0) {
+  if (platformAccountsAvailables.length > 0 && false) {
     // In the availables, get the account platforms almost full and the cheapest
     const platformAccountAlmostFullAndCheapest = platformAccountsAvailables
       .sort((a, b) => {
@@ -151,7 +175,8 @@ const startWatchContent = async (req: Request): Promise<Link> => {
       req,
       user,
       platformAccountAlmostFullAndCheapest[0],
-      dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss')
+      dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss'),
+      pool
     );
 
     // Return link and platform
@@ -170,7 +195,7 @@ const startWatchContent = async (req: Request): Promise<Link> => {
     // };
   }
 
-  //! There is no platform account available we need to create a new one
+  //! There is no platform account available, we check in the platform in creation
 
   // Get platform with free days or the cheapest
   const platformCheapest =
@@ -182,12 +207,82 @@ const startWatchContent = async (req: Request): Promise<Link> => {
         : curr
     );
 
+  // Get the platforms in creations
+  const platformsInCreation =
+    await PlatformAccountService.getPlatformAccountsInCreation(
+      req,
+      platformInfos.map((e) => e.name),
+      pool
+    );
+
+  // Add the user in the platfrom creation waiting list
+  if (platformsInCreation.length > 0) {
+    // Check if the account is ready
+    let platformInCreation =
+      await PlatformAccountService.updatePlatformAccountsInCreation(
+        req,
+        platformsInCreation[0],
+        pool
+      );
+
+    while (
+      platformInCreation.active !== true &&
+      platformInCreation.registration === 'started' &&
+      dayjs(platformInCreation.created_at).isAfter(
+        dayjs().subtract(config.creationWaitingTime, 'minute')
+      )
+    ) {
+      // Wait 10sec
+      await wait(10);
+
+      // Check if the account is ready
+      platformInCreation = platformInCreation =
+        await PlatformAccountService.getPlatformAccountFromEmail(
+          req,
+          platformInCreation.email,
+          pool
+        );
+    }
+    if (platformInCreation.active) {
+      // Save user platform
+      await UserPlatformService.createUserPlatformsSQL(
+        req,
+        user,
+        platformInCreation,
+        dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss'),
+        pool
+      );
+
+      // Return link
+      return element.links.find(
+        (link) => link.platform === platformInCreation.platform
+      )!;
+    } else {
+      //! The account creation is too long, maybe it has crash. We start create a new one.
+      pool.release();
+      startWatchContent(req, iteration + 1);
+    }
+  }
+
+  //! There is no platform account available, we need to create a new one
+
   // Create an account and use it
   const newPlatformAccount = await PlatformAccountService.createPlatformAccount(
     req,
-    platformCheapest
+    platformCheapest,
+    pool
   );
 
+  // Save user platform
+  await UserPlatformService.createUserPlatformsSQL(
+    req,
+    user,
+    newPlatformAccount,
+    dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss'),
+    pool
+  );
+
+  // Return link
   return element.links.find(
     (link) => link.platform === newPlatformAccount.platform
   )!;

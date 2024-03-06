@@ -15,6 +15,9 @@ const config: Config = {
   serverName: process.env.SERVER_NAME || 'back-api',
   delay: process.env.DELAY ? parseInt(process.env.DELAY) : 100, // 130 in prod
   logger: process.env.LOGGER === 'true',
+  creationWaitingTime: process.env.CREATION_WAITING_TIME
+    ? parseInt(process.env.CREATION_WAITING_TIME)
+    : 6,
 
   tokens: {
     access: {
@@ -77,7 +80,8 @@ const config: Config = {
     paymentUrl:
       process.env.VIVAWALLET_PAYMENT_URL_PROD || 'demo-api.vivapayments.com',
     accountUrl:
-      process.env.VIVAWALLET_ACCOUNT_URL_PROD || 'demo-accounts.vivapayments.com',
+      process.env.VIVAWALLET_ACCOUNT_URL_PROD ||
+      'demo-accounts.vivapayments.com',
     orderUrl: process.env.VIVAWALLET_ORDER_URL_PROD || 'demo.vivapayments.com',
     orderBasicAuth: process.env.VIVAWALLET_ORDER_BASIC_AUTH_PROD!,
     loginBasicAuth: process.env.VIVAWALLET_LOGIN_BASIC_AUTH_PROD!,

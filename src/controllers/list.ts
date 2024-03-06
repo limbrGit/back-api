@@ -116,11 +116,10 @@ const add = async (req: Request): Promise<List> => {
   }
 
   // Check if content is not in the list
-  const contentAlreadyInList = await ListService.getContentInListSQL(
-    req,
+  const contentAlreadyInList = await ListService.getContentInListSQL(req, {
     user,
-    content
-  );
+    content,
+  });
   if (contentAlreadyInList) {
     throw new AppError(CErrors.ContentAlreadyExistInList);
   }
@@ -158,11 +157,10 @@ const remove = async (req: Request): Promise<List> => {
   }
 
   // Check if content is not in the list
-  const contentAlreadyInList = await ListService.getContentInListSQL(
-    req,
+  const contentAlreadyInList = await ListService.getContentInListSQL(req, {
     user,
-    content
-  );
+    content,
+  });
   if (!contentAlreadyInList) {
     throw new AppError(CErrors.ContentNotInList);
   }

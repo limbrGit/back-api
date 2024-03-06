@@ -2,6 +2,7 @@
 import { Request } from 'express';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
+import { Connection } from 'mysql2/promise';
 
 // Config
 import config from '../configs/config';
@@ -33,6 +34,8 @@ const columnsGettable = `
   date_end,
   active,
   subscribed,
+  registration,
+  creation_waiting_list,
   created_at,
   updated_at,
   deleted_at
@@ -133,7 +136,8 @@ export const getPlatformAccountPassword = (
 
 export const getPlatformAccountFromEmail = async (
   req: Request,
-  email: string
+  email: string,
+  pool: Connection | null = null
 ): Promise<PlatformAccountSQL> => {
   const functionName = (i: number) =>
     'services/platformAccount.ts : getPlatformAccountFromEmail ' + i;
@@ -148,7 +152,7 @@ export const getPlatformAccountFromEmail = async (
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   const PlatformAccount = {
     ...result[0],
@@ -162,7 +166,8 @@ export const getPlatformAccountFromEmail = async (
 
 export const createPlatformAccount = async (
   req: Request,
-  platformInfo: PlatformInfoSQL
+  platformInfo: PlatformInfoSQL,
+  pool: Connection | null = null
 ): Promise<PlatformAccountSQL> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -185,7 +190,7 @@ export const createPlatformAccount = async (
   Logger.info({ functionName: functionName(2), data: data }, req);
 
   // Get Platform Account
-  const platformAccount = await getPlatformAccountFromEmail(req, data.email);
+  const platformAccount = await getPlatformAccountFromEmail(req, data.email, pool);
 
   return platformAccount;
 };
@@ -290,7 +295,8 @@ export const createPlatformAccount = async (
 
 export const getPlatformAccountsAvailable = async (
   req: Request,
-  platforms: string[]
+  platforms: string[],
+  pool: Connection | null = null
 ): Promise<PlatformAccountSQL[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -332,7 +338,7 @@ export const getPlatformAccountsAvailable = async (
   `;
   Logger.info({ functionName: functionName(1), sql: sql }, req);
 
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result;
 };
@@ -475,6 +481,74 @@ export const getPlatformAccountsAvailable = async (
 //   return lines;
 // };
 
+export const getPlatformAccountsInCreation = async (
+  req: Request,
+  platforms: string[],
+  pool: Connection | null = null
+): Promise<PlatformAccountSQL[]> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'services/database.ts : getPlatformAccountsInCreation ' + i;
+  Logger.info({ functionName: functionName(0), platforms }, req);
+
+  const sql = `
+    SELECT
+      ${(columnsGettable)
+        .split(',')
+        .map((e) => 'platform_accounts.' + e.trim())
+        .join(',')},
+      platform_info.users_per_account
+    FROM
+      platform_accounts
+    LEFT JOIN platform_info
+    ON
+        platform_accounts.platform = platform_info.name
+    WHERE
+      platform_accounts.registration = 'started'
+      AND platform_accounts.platform IN (${platforms.map((e) => "'" + e + "'")})
+      AND platform_accounts.created_at BETWEEN NOW() - INTERVAL ${config.creationWaitingTime} MINUTE AND NOW()
+      AND platform_accounts.creation_waiting_list < platform_info.users_per_account
+    GROUP BY
+      platform_accounts.email
+    ORDER BY
+      platform_accounts.creation_waiting_list DESC;
+    ;
+  `;
+  Logger.info({ functionName: functionName(1), sql: sql }, req);
+
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+
+  return result;
+};
+
+export const updatePlatformAccountsInCreation = async (
+  req: Request,
+  platformAccount: PlatformAccountSQL,
+  pool: Connection | null = null
+): Promise<PlatformAccountSQL> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'services/database.ts : updatePlatformAccountsInCreation ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+    UPDATE platform_accounts
+    SET
+      creation_waiting_list = ${platformAccount.creation_waiting_list + 1}
+    WHERE
+      platform_accounts.id = '${platformAccount.id}'
+    ;
+  `;
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
+  if (insertResult.affectedRows !== 1) {
+    throw new AppError(CErrors.processing);
+  }
+
+  const result = getPlatformAccountFromEmail(req, platformAccount.email, pool);
+
+  return result;
+};
+
 export default {
   // getPlatformAccountFromId,
   getPlatformAccountFromEmail,
@@ -490,4 +564,6 @@ export default {
   // getPlatformAccountsFromEmails,
   // platformAccountGetBadPasswords,
   getPlatformAccountsAvailable,
+  getPlatformAccountsInCreation,
+  updatePlatformAccountsInCreation,
 };

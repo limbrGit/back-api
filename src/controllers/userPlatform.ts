@@ -49,7 +49,7 @@ const getUserPlatform = async (req: Request): Promise<PlatformAccountSQL> => {
   // get user platforms for the user
   const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
     req,
-    user
+    { user }
   );
   if (!userPlatforms || userPlatforms.length === 0) {
     throw new AppError(CErrors.noUserPlatform);
@@ -101,7 +101,7 @@ const getUserPlatformOtp = async (req: Request): Promise<string> => {
   // get user platforms for the user
   const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
     req,
-    user
+    { user }
   );
   if (!userPlatforms || userPlatforms.length === 0) {
     throw new AppError(CErrors.noUserPlatform);

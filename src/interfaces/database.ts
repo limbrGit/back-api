@@ -9,6 +9,8 @@ export interface PlatformAccountSQL {
   date_end: number | null;
   active: Boolean;
   subscribed: Boolean;
+  registration?: string;
+  creation_waiting_list: number;
   created_at: number;
   updated_at: number;
   deleted_at: number | null;

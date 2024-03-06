@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { UserSQL } from '../interfaces/user';
@@ -19,7 +20,8 @@ import SqlService from './sql';
 
 export const getResetPasswordTokenFromTokenSQL = async (
   req: Request,
-  token: string
+  token: string,
+  pool: Connection | null = null
 ): Promise<RessetPassword> => {
   const functionName = (i: number) =>
     'services/user.ts : getResetPasswordTokenFromTokenSQL ' + i;
@@ -31,14 +33,15 @@ export const getResetPasswordTokenFromTokenSQL = async (
     WHERE users_reset_password.token = "${token}"
     LIMIT 1;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result[0];
 };
 
 export const getResetPasswordTokenFromIdSQL = async (
   req: Request,
-  id: string
+  id: string,
+  pool: Connection | null = null
 ): Promise<RessetPassword> => {
   const functionName = (i: number) =>
     'services/user.ts : getResetPasswordTokenFromIdSQL ' + i;
@@ -50,7 +53,7 @@ export const getResetPasswordTokenFromIdSQL = async (
     WHERE users_reset_password.id = "${id}"
     LIMIT 1;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result[0];
 };
@@ -60,7 +63,8 @@ export const createRessetpasswordTokenSQL = async (
   id: string,
   userSQL: UserSQL,
   token: string,
-  expireDate: string
+  expireDate: string,
+  pool: Connection | null = null
 ): Promise<RessetPassword> => {
   const functionName = (i: number) =>
     'services/user.ts : createRessetpasswordTokenSQL ' + i;
@@ -85,19 +89,20 @@ export const createRessetpasswordTokenSQL = async (
       NULL
     );
   `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getResetPasswordTokenFromIdSQL(req, id);
+  const result = getResetPasswordTokenFromIdSQL(req, id, pool);
 
   return result;
 };
 
 export const updateRessetpasswordTokenSQL = async (
   req: Request,
-  id: string
+  id: string,
+  pool: Connection | null = null
 ): Promise<RessetPassword> => {
   const functionName = (i: number) =>
     'services/user.ts : updateRessetpasswordTokenSQL ' + i;
@@ -113,12 +118,12 @@ export const updateRessetpasswordTokenSQL = async (
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getResetPasswordTokenFromIdSQL(req, id);
+  const result = getResetPasswordTokenFromIdSQL(req, id, pool);
 
   return result;
 };

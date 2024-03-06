@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { PlatformInfoSQL } from '../interfaces/database';
@@ -12,7 +13,8 @@ import SqlService from './sql';
 
 export const getPlatformInfoFromName = async (
   req: Request,
-  name: string
+  name: string,
+  pool: Connection | null = null
 ): Promise<PlatformInfoSQL> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -30,7 +32,12 @@ export const getPlatformInfoFromName = async (
     LIMIT 1
     ;
   `;
-  const lines: PlatformInfoSQL[] = await SqlService.sendSqlRequest(req, sql);
+  const lines: PlatformInfoSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [],
+    pool
+  );
 
   return lines[0];
 };

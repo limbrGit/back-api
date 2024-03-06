@@ -1,6 +1,7 @@
 // Imports
 import { Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { PaymentTransactionSQL } from '../interfaces/paymentTransaction';
@@ -32,7 +33,8 @@ const columnsGettable = `
 
 export const getAllPaymentTransactionFromUserSQL = async (
   req: Request,
-  user: UserSQL | User
+  user: UserSQL | User,
+  pool: Connection | null = null
 ): Promise<PaymentTransactionSQL[]> => {
   const functionName = (i: number) =>
     'services/paymentTransaction.ts : getAllPaymentTransactionFromUserSQL ' + i;
@@ -50,7 +52,7 @@ export const getAllPaymentTransactionFromUserSQL = async (
   const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [user.email]
+    [user.email], pool
   );
 
   return result;
@@ -58,7 +60,8 @@ export const getAllPaymentTransactionFromUserSQL = async (
 
 export const getPaymentTransactionFromIdSQL = async (
   req: Request,
-  paymentTransactionId: string
+  paymentTransactionId: string,
+  pool: Connection | null = null
 ): Promise<PaymentTransactionSQL> => {
   const functionName = (i: number) =>
     'services/paymentTransaction.ts : getPaymentTransactionFromIdSQL ' + i;
@@ -77,7 +80,7 @@ export const getPaymentTransactionFromIdSQL = async (
   const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [paymentTransactionId]
+    [paymentTransactionId], pool
   );
 
   return result[0];
@@ -85,7 +88,8 @@ export const getPaymentTransactionFromIdSQL = async (
 
 export const getPaymentTransactionFromVivawalletOrderCodeSQL = async (
   req: Request,
-  vivawalletOrderCode: string
+  vivawalletOrderCode: string,
+  pool: Connection | null = null
 ): Promise<PaymentTransactionSQL> => {
   const functionName = (i: number) =>
     'services/paymentTransaction.ts : getPaymentTransactionFromVivawalletOrderCodeSQL ' +
@@ -105,7 +109,7 @@ export const getPaymentTransactionFromVivawalletOrderCodeSQL = async (
   const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [vivawalletOrderCode]
+    [vivawalletOrderCode], pool
   );
 
   return result[0];
@@ -114,7 +118,8 @@ export const getPaymentTransactionFromVivawalletOrderCodeSQL = async (
 export const createPaymentTransactionSQL = async (
   req: Request,
   user: UserSQL | User,
-  paymentOfferName: PaymentOfferName
+  paymentOfferName: PaymentOfferName,
+  pool: Connection | null = null
 ): Promise<PaymentTransactionSQL> => {
   const functionName = (i: number) =>
     'services/paymentTransaction.ts : createPaymentTransactionSQL ' + i;
@@ -140,19 +145,20 @@ export const createPaymentTransactionSQL = async (
     id,
     user.email,
     paymentOfferName,
-  ]);
+  ], pool);
   if (insertResult.affectedRows === 0) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getPaymentTransactionFromIdSQL(req, id);
+  const result = getPaymentTransactionFromIdSQL(req, id, pool);
 
   return result;
 };
 
 export const updatePaymentTransactionSQL = async (
   req: Request,
-  transaction: PaymentTransactionSQL
+  transaction: PaymentTransactionSQL,
+  pool: Connection | null = null
 ): Promise<PaymentTransactionSQL> => {
   const functionName = (i: number) =>
     'services/paymentTransaction.ts : updatePaymentTransactionSQL ' + i;
@@ -174,12 +180,12 @@ export const updatePaymentTransactionSQL = async (
       id = '${transaction.id}'
     ;
   `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getPaymentTransactionFromIdSQL(req, transaction.id);
+  const result = getPaymentTransactionFromIdSQL(req, transaction.id, pool);
 
   return result;
 };

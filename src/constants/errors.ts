@@ -218,6 +218,11 @@ const CErrors = {
     message: 'PROCESSING ERROR',
     detail: 'Error to get user platform',
   },
+  createPlatformAccountError: {
+    code: 500.7,
+    message: 'PROCESSING ERROR',
+    detail: 'Error to create a platform account',
+  },
 };
 
 export default CErrors;

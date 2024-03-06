@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import { Connection } from 'mysql2/promise';
 
 // Interfaces
 import { UserSQL, User } from '../interfaces/user';
@@ -29,7 +30,8 @@ const columnsGettable = `
 
 export const getListSQL = async (
   req: Request,
-  user: UserSQL | User
+  user: UserSQL | User,
+  pool: Connection | null = null
 ): Promise<ListSQL[]> => {
   const functionName = (i: number) => 'services/list.ts : getListSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
@@ -43,18 +45,26 @@ export const getListSQL = async (
       deleted_at IS NULL
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, []);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result;
 };
 
+interface GetContentInListSQL {
+  user: UserSQL | User;
+  content: Content;
+  returnDeleted?: boolean;
+  pool?: Connection | null
+}
+
 export const getContentInListSQL = async (
   req: Request,
-  user: UserSQL | User,
-  content: Content,
-  returnDeleted: boolean = false
+  data: GetContentInListSQL
 ): Promise<ListSQL> => {
-  const functionName = (i: number) => 'services/list.ts : getListSQL ' + i;
+  const { user, content, returnDeleted = false, pool = null } = data;
+
+  const functionName = (i: number) =>
+    'services/list.ts : getContentInListSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -68,7 +78,7 @@ export const getContentInListSQL = async (
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, []);
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
 
   return result[0];
 };
@@ -76,7 +86,8 @@ export const getContentInListSQL = async (
 export const addContentInListSQL = async (
   req: Request,
   user: UserSQL | User,
-  content: Content
+  content: Content,
+  pool: Connection | null = null
 ): Promise<ListSQL> => {
   const functionName = (i: number) =>
     'services/list.ts : addContentInListSQL ' + i;
@@ -105,12 +116,12 @@ export const addContentInListSQL = async (
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows === 0) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getContentInListSQL(req, user, content);
+  const result = getContentInListSQL(req, { user, content, pool });
 
   return result;
 };
@@ -118,7 +129,8 @@ export const addContentInListSQL = async (
 export const deleteContentInListSQL = async (
   req: Request,
   user: UserSQL | User,
-  content: Content
+  content: Content,
+  pool: Connection | null = null
 ): Promise<ListSQL> => {
   const functionName = (i: number) =>
     'services/list.ts : deleteContentInListSQL ' + i;
@@ -134,12 +146,17 @@ export const deleteContentInListSQL = async (
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql, []);
+  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
 
-  const result = getContentInListSQL(req, user, content, true);
+  const result = getContentInListSQL(req, {
+    user,
+    content,
+    returnDeleted: true,
+    pool,
+  });
 
   return result;
 };

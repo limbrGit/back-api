@@ -79,6 +79,7 @@ export interface Config {
   serverName: string;
   delay: number;
   logger: boolean;
+  creationWaitingTime: number;
   tokens: Tokens;
   mailSender: MailSender;
   mailServer: MailServer;
