@@ -65,9 +65,9 @@ const startWatchContent = async (
   }
 
   // Check if user have a current token
-  // if (!user.token_end_date || (user.token_end_date as number) < Date.now()) {
-  //   throw new AppError(CErrors.noCurrentToken);
-  // }
+  if (!user.token_end_date || (user.token_end_date as number) < Date.now()) {
+    throw new AppError(CErrors.noCurrentToken);
+  }
 
   // Get content or episode
   const content =
@@ -111,7 +111,7 @@ const startWatchContent = async (
   );
 
   //! If the user already have a platform account used with this content
-  if (platformAlreadyUsed && false) {
+  if (platformAlreadyUsed) {
     // Get platform account
     const platformAccount =
       await PlatformAccountService.getPlatformAccountFromEmail(
@@ -147,7 +147,7 @@ const startWatchContent = async (
   // Logger.info({ functionName: functionName(1), platformInfos: platformInfos.map((e) => e.name) }, req);
   // Logger.info({ functionName: functionName(1), platformAccountsAvailables }, req);
   //! Find the platform with the less place
-  if (platformAccountsAvailables.length > 0 && false) {
+  if (platformAccountsAvailables.length > 0) {
     // In the availables, get the account platforms almost full and the cheapest
     const platformAccountAlmostFullAndCheapest = platformAccountsAvailables
       .sort((a, b) => {

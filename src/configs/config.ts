@@ -67,6 +67,8 @@ const config: Config = {
 
   cipher: {
     algorithm: process.env.CIPHER_ALGORITHM || 'aes-256-cbc',
+    cardNumber: process.env.CIPHER_CARD_NUMBER!,
+    cardCrypto: process.env.CIPHER_CARD_CRYPTO!,
     netflix: process.env.CIPHER_NETFLIX!,
     disney: process.env.CIPHER_DISNEY!,
     canal: process.env.CIPHER_CANAL!,

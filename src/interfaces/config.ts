@@ -49,6 +49,8 @@ export interface LimbrLinks {
 
 export interface CipherKeys {
   algorithm: string;
+  cardNumber: string;
+  cardCrypto: string;
   netflix: string;
   disney: string;
   canal: string;

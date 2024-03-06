@@ -14,4 +14,6 @@ export interface HeadersParams {
 export interface Params {
   query: QueryParams;
   headers: HeadersParams | IncomingHttpHeaders;
+  body: any;
+  params: any;
 }

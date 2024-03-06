@@ -35,7 +35,7 @@ const getAll = async (req: Request): Promise<User[]> => {
   const functionName = (i: number) => 'controller/user.ts : getAll ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
-  const user = await UserService.getUserFromIdSQL(req, req?.user?.id);
+  const user = await UserService.getUserFromIdWithAdminSQL(req, req?.user?.id);
   if (!user?.admin) {
     throw new AppError(CErrors.forbidden);
   }

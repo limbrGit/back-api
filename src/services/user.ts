@@ -311,6 +311,32 @@ export const deleteUserSQL = async (
   return result;
 };
 
+
+export const getUserFromIdWithAdminSQL = async (
+  req: Request,
+  id: string,
+  pool: Connection | null = null
+): Promise<UserSQL> => {
+  const functionName = (i: number) =>
+    'services/user.ts : getUserFromIdWithAdminSQL ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+    SELECT
+      admin,
+      ${columnsGettable}
+    FROM users
+    WHERE
+      users.id = "${id}"
+    LIMIT 1
+    ;
+  `;
+  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+
+  return result[0];
+};
+
+
 export default {
   getAllUserSQL,
   getUserFromUsernameSQL,
@@ -321,4 +347,5 @@ export default {
   changePasswordUserSQL,
   valideConfirmationCode,
   deleteUserSQL,
+  getUserFromIdWithAdminSQL
 };

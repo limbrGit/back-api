@@ -12,10 +12,10 @@ import authenticateToken from '../middlewares/authentication';
 // Controllers
 import SupportController from '../controllers/support';
 
-const tokenApis = express.Router();
+const supportApis = express.Router();
 
 // Send contact-us email in platform
-tokenApis.post(
+supportApis.post(
   '/contact-us',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -34,4 +34,4 @@ tokenApis.post(
   })
 );
 
-export default tokenApis;
+export default supportApis;
