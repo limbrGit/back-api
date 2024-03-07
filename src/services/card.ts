@@ -26,6 +26,7 @@ import config from '../configs/config';
 const columnsGettable = `
   id,
   name,
+  bank,
   last_numbers,
   number_iv,
   number_cipher,
@@ -128,6 +129,7 @@ export const addCardSQL = async (
     INSERT INTO payment_cards (
       id,
       name,
+      bank,
       last_numbers,
       number_iv,
       number_cipher,
@@ -136,6 +138,7 @@ export const addCardSQL = async (
       crypto
     )
     VALUES (
+      ?,
       ?,
       ?,
       ?,
@@ -157,6 +160,7 @@ export const addCardSQL = async (
     [
       id,
       card.name,
+      card.bank,
       card.number!.slice(-4),
       iv,
       cipherPhrase,
@@ -243,9 +247,46 @@ export const getCardForAPlatformSQL = async (
   return result[0];
 };
 
+export const updateAPlatformInCardFromIdSQL = async (
+  req: Request,
+  card: CardSQL,
+  platform: string,
+  pool: Connection | null = null
+): Promise<CardSQL> => {
+  const functionName = (i: number) =>
+    'services/card.ts : updateAPlatformInCardFromIdSQL ' + i;
+  Logger.info({ functionName: functionName(0), platform }, req);
+
+  const sql = `
+    UPDATE payment_cards
+    SET
+      ${platform} = ?
+    WHERE
+      id = ?
+    ;
+  `;
+  const insertResult = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [
+      card[platform as 'disney' | 'netflix' | 'paramount' | 'canal'] + 1,
+      card.id,
+    ],
+    pool
+  );
+  if (insertResult.affectedRows !== 1) {
+    throw new AppError(CErrors.processing);
+  }
+
+  const result = getCardFromIdSQL(req, card.id, pool);
+
+  return result;
+};
+
 export default {
   getCardFromIdSQL,
   addCardSQL,
   getCardFromIdWithNumberSQL,
   getCardForAPlatformSQL,
+  updateAPlatformInCardFromIdSQL,
 };

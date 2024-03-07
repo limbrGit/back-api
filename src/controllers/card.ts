@@ -9,6 +9,7 @@ import Logger from '../tools/logger';
 
 // Constants
 import CErrors from '../constants/errors';
+import { PAYPAL, LYDIA } from '../constants/banks';
 
 // Classes
 import AppError from '../classes/AppError';
@@ -33,12 +34,13 @@ const addCard = async (req: Request): Promise<Card> => {
     body: req.body,
     params: req.params,
   };
-  const { name, number, month, year, crypto } = params.body;
-  if (!name || !number || !month || !year || !crypto) {
+  const { name, bank, number, month, year, crypto } = params.body;
+  if (!name || !bank || !number || !month || !year || !crypto) {
     throw new AppError(CErrors.missingParameter);
   }
   if (
     name.length < 5 ||
+    ![PAYPAL, LYDIA].includes(bank) ||
     number.length !== 16 ||
     month.length !== 2 ||
     year.length !== 2 ||
@@ -68,6 +70,7 @@ const addCard = async (req: Request): Promise<Card> => {
 
   const card: Card = {
     name,
+    bank,
     number,
     month,
     year,
@@ -160,9 +163,16 @@ const getCardForAPlatform = async (req: Request): Promise<Card> => {
     throw new AppError(CErrors.forbidden);
   }
 
-  const result = await CardService.getCardForAPlatformSQL(req, platform, pool);
+  const card = await CardService.getCardForAPlatformSQL(req, platform, pool);
 
-  return result;
+  // const result = await CardService.updateAPlatformInCardFromIdSQL(
+  //   req,
+  //   card,
+  //   platform,
+  //   pool
+  // );
+
+  return card;
 };
 
 export default {

@@ -1,5 +1,6 @@
 export interface Card {
   name: string;
+  bank: string;
   number?: string;
   month: string;
   year: string;
