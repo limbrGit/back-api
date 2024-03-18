@@ -3,4 +3,5 @@ export interface IError {
   message: string;
   detail: string;
   isOperational?: boolean;
+  routeName?: string
 }

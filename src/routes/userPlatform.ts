@@ -24,12 +24,8 @@ userPlatformApis.get(
       Logger.info({ functionName:functionName  }, req);
       const result = await UserPlatformController.getUserPlatform(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -44,12 +40,8 @@ userPlatformApis.get(
       Logger.info({ functionName:functionName  }, req);
       const result = await UserPlatformController.getUserPlatformOtp(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );

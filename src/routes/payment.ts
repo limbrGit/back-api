@@ -24,12 +24,8 @@ paymentApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await PaymentController.checkPayment(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error, alerte: true },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -44,12 +40,8 @@ paymentApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await PaymentController.startPayment(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error, alerte: true },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );

@@ -22,12 +22,8 @@ listApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await ListController.getAll(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -42,12 +38,8 @@ listApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await ListController.getAllContents(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -62,12 +54,8 @@ listApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await ListController.add(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -82,12 +70,8 @@ listApis.delete(
       Logger.info({ functionName: functionName }, req);
       const result = await ListController.remove(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );

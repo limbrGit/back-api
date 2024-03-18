@@ -235,7 +235,8 @@ export const getCardForAPlatformSQL = async (
       ${columnsGettable}
     FROM payment_cards
     WHERE
-      deleted_at IS NULL
+      active = 1
+      AND deleted_at IS NULL
     ORDER BY
       ${platform} ASC,
       id DESC
@@ -263,6 +264,7 @@ export const updateAPlatformInCardFromIdSQL = async (
       ${platform} = ?
     WHERE
       id = ?
+      AND deleted_at IS NULL
     ;
   `;
   const insertResult = await SqlService.sendSqlRequest(

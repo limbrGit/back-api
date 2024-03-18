@@ -5,6 +5,7 @@ export default class AppError extends Error {
   public readonly code: number;
   public readonly detail: string;
   public readonly isOperational: boolean = true;
+  public readonly routeName?: string;
 
   constructor(args: IError) {
     super(args.message);
@@ -17,6 +18,10 @@ export default class AppError extends Error {
 
     if (args.isOperational !== undefined) {
       this.isOperational = args.isOperational;
+    }
+
+    if (args.routeName) {
+      this.routeName = args.routeName;
     }
 
     Error.captureStackTrace(this);

@@ -22,6 +22,7 @@ import SqlService from './sql';
 
 // Config
 import config from '../configs/config';
+import { Agent } from 'https';
 
 const columnsGettable = `
   id,
@@ -37,7 +38,7 @@ const columnsGettable = `
 interface GetUserPlatformsFromUserSQL {
   user: UserSQL;
   active?: boolean;
-  pool?: Connection | null
+  pool?: Connection | null;
 }
 
 export const getUserPlatformsFromUserSQL = async (
@@ -80,7 +81,7 @@ export const getUserPlatformsFromUserSQL = async (
 interface GetUserPlatformsFromPlatformSQL {
   platformAccount: PlatformAccountSQL;
   active?: boolean;
-  pool?: Connection | null
+  pool?: Connection | null;
 }
 
 export const getUserPlatformsFromPlatformSQL = async (
@@ -124,7 +125,7 @@ interface GetUserPlatformsFromUserAndPlatformSQL {
   user: UserSQL;
   platformAccount: PlatformAccountSQL;
   active?: boolean;
-  pool?: Connection | null
+  pool?: Connection | null;
 }
 
 export const getUserPlatformsFromUserAndPlatformSQL = async (

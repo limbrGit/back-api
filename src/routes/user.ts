@@ -22,12 +22,8 @@ userApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.getAll(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -42,12 +38,8 @@ userApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.getUserById(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -61,12 +53,8 @@ userApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.create(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -81,12 +69,8 @@ userApis.put(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.updatePassword(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -101,12 +85,8 @@ userApis.put(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.update(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -121,12 +101,8 @@ userApis.delete(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.deleteUser(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -141,12 +117,8 @@ userApis.put(
       Logger.info({ functionName: functionName }, req);
       const result = await UserController.updateSubs(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );

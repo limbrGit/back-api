@@ -10,19 +10,19 @@ import Logger from '../tools/logger';
 import authenticateToken from '../middlewares/authentication';
 
 // Controllers
-import SupportController from '../controllers/support';
+import NotificationController from '../controllers/notification';
 
-const supportApis = express.Router();
+const notificationApis = express.Router();
 
-// Send contact-us email in platform
-supportApis.post(
-  '/contact-us',
+// send an alert notification
+notificationApis.post(
+  '/',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const functionName = 'POST on /support/contact-us';
+    const functionName = 'POST on /notification';
     try {
       Logger.info({ functionName: functionName }, req);
-      const result = await SupportController.contactUs(req);
+      const result = await NotificationController.sendNotification(req);
       res.json(result);
     } catch (error: any) {
       next({ ...error, message: error.message, routeName: functionName });
@@ -30,4 +30,4 @@ supportApis.post(
   })
 );
 
-export default supportApis;
+export default notificationApis;

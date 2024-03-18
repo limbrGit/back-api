@@ -24,12 +24,8 @@ cardApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await CardController.addCard(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -44,12 +40,8 @@ cardApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await CardController.getCardForAPlatform(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -64,12 +56,8 @@ cardApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await CardController.getCardById(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );

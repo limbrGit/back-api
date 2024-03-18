@@ -97,9 +97,10 @@ const notificationDiscord = async (data: any, req?: Request) => {
   const dataJson =
     typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
 
-  const codeError = (dataJson.code
-    ? dataJson.code >= 500 && dataJson.code < 600
-    : dataJson.toString() !== '[object Object]') || data.alerte;
+  const codeError =
+    (dataJson.code
+      ? dataJson.code >= 500 && dataJson.code < 600
+      : dataJson.toString() !== '[object Object]') || data.alerte;
 
   // Tuto : https://gist.github.com/Birdie0/78ee79402a4301b1faf412ab5f1cdcf9
   await fetch(
@@ -138,9 +139,9 @@ const notificationDiscord = async (data: any, req?: Request) => {
               {
                 name: 'Data',
                 value:
-                  dataJson.toString() === '[object Object]'
-                    ? JSON.stringify(dataJson)
-                    : dataJson.toString(),
+                  typeof data.data === 'string'
+                    ? data.data
+                    : JSON.stringify(data.data),
               },
             ],
           },

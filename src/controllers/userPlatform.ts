@@ -18,11 +18,14 @@ import AppError from '../classes/AppError';
 import UserService from '../services/user';
 import UserPlatformService from '../services/userPlatforms';
 import PlatformAccountService from '../services/platformAccount';
+import SqlService from '../services/sql';
 
-const getUserPlatform = async (req: Request): Promise<PlatformAccountSQL> => {
+const getUserPlatform = async (
+  req: Request
+): Promise<PlatformAccountSQL & { cookies?: any; localStorag?: any; data?: any }> => {
   // Set function name for logs
   const functionName = (i: number) =>
-    'controller/list.ts : getUserPlatform ' + i;
+    'controller/userPlatform.ts : getUserPlatform ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const { platform }: { platform?: string } = req.params;
@@ -31,9 +34,13 @@ const getUserPlatform = async (req: Request): Promise<PlatformAccountSQL> => {
   if (!platform) {
     throw new AppError(CErrors.missingParameter);
   }
+  Logger.info({ functionName: functionName(1), platform }, req);
+
+  // Create pool connection
+  const pool = await SqlService.createPool(req);
 
   // Check user
-  let user = await UserService.getUserFromIdSQL(req, req?.user?.id);
+  let user = await UserService.getUserFromIdSQL(req, req?.user?.id, pool);
   if (!user) {
     throw new AppError(CErrors.userNotFound);
   }
@@ -49,7 +56,7 @@ const getUserPlatform = async (req: Request): Promise<PlatformAccountSQL> => {
   // get user platforms for the user
   const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
     req,
-    { user }
+    { user, pool }
   );
   if (!userPlatforms || userPlatforms.length === 0) {
     throw new AppError(CErrors.noUserPlatform);
@@ -62,18 +69,29 @@ const getUserPlatform = async (req: Request): Promise<PlatformAccountSQL> => {
   }
 
   // Get the platform account
-  const platformAccount = PlatformAccountService.getPlatformAccountFromEmail(
-    req,
-    userPlatform.platform_account_email!
-  );
+  const platformAccount =
+    await PlatformAccountService.getPlatformAccountFromEmail(
+      req,
+      userPlatform.platform_account_email!,
+      pool
+    );
+  platformAccount.password = '';
 
-  return platformAccount;
+  // Get the connexion cookies for the platform account
+  const connexionData =
+    await PlatformAccountService.getPlatformAccountConnexion(
+      req,
+      platformAccount,
+      pool
+    );
+
+  return { ...platformAccount, ...connexionData };
 };
 
 const getUserPlatformOtp = async (req: Request): Promise<string> => {
   // Set function name for logs
   const functionName = (i: number) =>
-    'controller/list.ts : getUserPlatformOtp ' + i;
+    'controller/userPlatform.ts : getUserPlatformOtp ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const { platform }: { platform?: string } = req.params;

@@ -20,12 +20,8 @@ userApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await AuthenticationController.login(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -39,12 +35,8 @@ userApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await AuthenticationController.refreshToken(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -58,12 +50,8 @@ userApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await AuthenticationController.sendCode(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -77,12 +65,8 @@ userApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await AuthenticationController.confirmCode(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -96,12 +80,8 @@ userApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await AuthenticationController.forgotPassword(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
@@ -115,12 +95,8 @@ userApis.post(
       Logger.info({ functionName: functionName }, req);
       const result = await AuthenticationController.resetPassword(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );

@@ -25,6 +25,7 @@ import tokenRoutes from './src/routes/token';
 import userPlatformRoutes from './src/routes/userPlatform';
 import supportRoutes from './src/routes/support';
 import cardRoutes from './src/routes/card';
+import notificationRoutes from './src/routes/notification';
 
 // Tools
 import Logger from './src/tools/logger';
@@ -65,6 +66,7 @@ app.use('/token', tokenRoutes);
 app.use('/userPlatform', userPlatformRoutes);
 app.use('/support', supportRoutes);
 app.use('/card', cardRoutes);
+app.use('/notification', notificationRoutes);
 
 // Check Service
 app.get(

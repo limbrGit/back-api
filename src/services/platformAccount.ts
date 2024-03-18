@@ -190,7 +190,11 @@ export const createPlatformAccount = async (
   Logger.info({ functionName: functionName(2), data: data }, req);
 
   // Get Platform Account
-  const platformAccount = await getPlatformAccountFromEmail(req, data.email, pool);
+  const platformAccount = await getPlatformAccountFromEmail(
+    req,
+    data.email,
+    pool
+  );
 
   return platformAccount;
 };
@@ -493,7 +497,7 @@ export const getPlatformAccountsInCreation = async (
 
   const sql = `
     SELECT
-      ${(columnsGettable)
+      ${columnsGettable
         .split(',')
         .map((e) => 'platform_accounts.' + e.trim())
         .join(',')},
@@ -506,7 +510,9 @@ export const getPlatformAccountsInCreation = async (
     WHERE
       platform_accounts.registration = 'started'
       AND platform_accounts.platform IN (${platforms.map((e) => "'" + e + "'")})
-      AND platform_accounts.created_at BETWEEN NOW() - INTERVAL ${config.creationWaitingTime} MINUTE AND NOW()
+      AND platform_accounts.created_at BETWEEN NOW() - INTERVAL ${
+        config.creationWaitingTime
+      } MINUTE AND NOW()
       AND platform_accounts.creation_waiting_list < platform_info.users_per_account
     GROUP BY
       platform_accounts.email
@@ -549,6 +555,34 @@ export const updatePlatformAccountsInCreation = async (
   return result;
 };
 
+export const getPlatformAccountConnexion = async (
+  req: Request,
+  platformAccount: PlatformAccountSQL,
+  pool: Connection | null = null
+): Promise<any> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'services/database.ts : getPlatformAccountConnexion ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  // Create account
+  const response = await fetch(
+    `${config.limbr.accountApi}/${platformAccount.platform}/connexion?email=${platformAccount.email}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: req.headers.authorization,
+      },
+    }
+  );
+
+  // Get the result
+  const data: { email: string } = await response.json();
+  Logger.info({ functionName: functionName(2), data: data }, req);
+
+  return data;
+};
+
 export default {
   // getPlatformAccountFromId,
   getPlatformAccountFromEmail,
@@ -566,4 +600,5 @@ export default {
   getPlatformAccountsAvailable,
   getPlatformAccountsInCreation,
   updatePlatformAccountsInCreation,
+  getPlatformAccountConnexion,
 };

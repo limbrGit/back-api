@@ -24,12 +24,8 @@ watchApis.get(
       Logger.info({ functionName: functionName }, req);
       const result = await WatchController.startWatchContent(req);
       res.json(result);
-    } catch (error) {
-      Notifications.sendNotification(
-        { message: 'Error on : ' + functionName, data: error },
-        req
-      );
-      next(error);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
     }
   })
 );
