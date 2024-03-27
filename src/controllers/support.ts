@@ -1,12 +1,12 @@
 // Imports
 import { Request } from 'express';
-import dayjs from 'dayjs';
 
 // Interfaces
-import { UserSQL } from '../interfaces/user';
+import { Params } from '../interfaces/tools';
 
 // Tools
 import Logger from '../tools/logger';
+import Notifications from '../tools/notifications';
 
 // Constants
 import CErrors from '../constants/errors';
@@ -23,7 +23,16 @@ const contactUs = async (req: Request): Promise<{ data: string }> => {
   const functionName = (i: number) => 'controller/list.ts : contactUs ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
-  const message: string = req.body.message;
+  // const message: string = req.body.message;
+
+  // Check params
+  const params: Params = {
+    query: req.query,
+    headers: req.headers,
+    body: req.body,
+    params: req.params,
+  };
+  const { message, clientMail = true } = params.body;
 
   // Check param
   if (!message || message.length === 0) {
@@ -39,7 +48,17 @@ const contactUs = async (req: Request): Promise<{ data: string }> => {
     throw new AppError(CErrors.userDeleted);
   }
 
-  await SendMails.sendContactUsMail(req, user, message);
+  await SendMails.sendContactUsMail(req, user, message, clientMail);
+
+  await Notifications.sendNotification(
+    {
+      message: 'A user try to contact us',
+      data: { user: user?.id, email: user?.email },
+      alerte: true,
+      support: true,
+    },
+    req
+  );
 
   return { data: 'Email sended' };
 };

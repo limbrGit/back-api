@@ -38,7 +38,11 @@ const ErrorHandler = (
     const { routeName } = err;
     if (routeName) {
       Notifications.sendNotification(
-        { message: 'Error on : ' + routeName, data: { code, message, detail } },
+        {
+          message: 'Error on : ' + routeName,
+          data: { code, message, detail },
+          dev: true,
+        },
         req
       );
     }

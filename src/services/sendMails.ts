@@ -254,7 +254,8 @@ export const sendResetPasswordMail = async (
 export const sendContactUsMail = async (
   req: Request,
   user: UserSQL,
-  message: string
+  message: string,
+  clientMail: boolean
 ): Promise<SMTPTransport.SentMessageInfo[]> => {
   const functionName = (i: number) =>
     'services/sendMails.ts : sendContactUsMail ' + i;
@@ -320,6 +321,9 @@ export const sendContactUsMail = async (
   const resultSupport = await sendMail(req, mailDataSupport);
   Logger.info({ functionName: functionName(1), resultSupport: resultSupport }, req);
 
+  if (!clientMail) {
+    return [resultSupport];
+  }
 
   let mailDataClient: MailData = {
     from: `Limbr <${config.mailSender.user}>`, // sender address

@@ -63,6 +63,7 @@ const sendNotification = async (req: Request): Promise<{ data: string }> => {
       message: message,
       data: { user: user?.id, ...data },
       alerte: true,
+      dev: true
     },
     req
   );

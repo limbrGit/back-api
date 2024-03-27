@@ -3,7 +3,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import asyncHandler from 'express-async-handler';
 
 // Tools
-import Notifications from '../tools/notifications';
 import Logger from '../tools/logger';
 
 // Middlewares

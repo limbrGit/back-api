@@ -114,8 +114,10 @@ const notificationDiscord = async (data: any, req?: Request) => {
       },
       redirect: 'follow',
       body: JSON.stringify({
-        content: `Bonjour${
-          codeError ? ' <@&1211990689202569226>' : ''
+        content: `Bonjour${codeError ? ' <@&1211990689202569226>' : ''}${
+          data?.support ? ' <@&1222521962992111646>' : ''
+        }${
+          data?.dev ? ' <@&1222522574911832096>' : ''
         }, un service a eu une erreur :`,
         username: 'Alerte ' + config.env,
         avatar_url: config.notifications.logoUrl,
