@@ -28,6 +28,22 @@ userApis.get(
   })
 );
 
+// Get my user
+userApis.get(
+  '/me',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /users/me';
+    try {
+      Logger.info({ functionName: functionName }, req);
+      const result = await UserController.getMyUser(req);
+      res.json(result);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
+    }
+  })
+);
+
 // Get user by id or email
 userApis.get(
   '/:identifier',

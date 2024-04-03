@@ -77,6 +77,28 @@ const getUserByIdOrEmail = async (req: Request): Promise<User> => {
   };
 };
 
+const getMyUser = async (req: Request): Promise<User> => {
+  // Set function name for logs
+  const functionName = (i: number) => 'controller/user.ts : getMyUser ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  // Get user
+  const result = await UserService.getUserFromIdSQL(req, req?.user?.id);
+
+  if (result.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+
+  delete result.hash;
+  delete result.salt;
+  delete result.confirmation_code;
+
+  return {
+    ...result,
+    subs: result.subs ? (result.subs as string).split(',') : [],
+  };
+};
+
 const create = async (req: Request): Promise<User> => {
   // Set function name for logs
   const functionName = (i: number) => 'controller/user.ts : create ' + i;
@@ -417,4 +439,5 @@ export default {
   update,
   deleteUser,
   updateSubs,
+  getMyUser,
 };
