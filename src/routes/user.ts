@@ -28,15 +28,15 @@ userApis.get(
   })
 );
 
-// Get user by id
+// Get user by id or email
 userApis.get(
-  '/:id',
+  '/:identifier',
   authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const functionName = 'GET on /users/:id';
+    const functionName = 'GET on /users/:identifier';
     try {
       Logger.info({ functionName: functionName }, req);
-      const result = await UserController.getUserById(req);
+      const result = await UserController.getUserByIdOrEmail(req);
       res.json(result);
     } catch (error: any) {
       next({ ...error, message: error.message, routeName: functionName });

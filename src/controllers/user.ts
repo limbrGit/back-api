@@ -44,18 +44,24 @@ const getAll = async (req: Request): Promise<User[]> => {
   return result;
 };
 
-const getUserById = async (req: Request): Promise<User> => {
+const getUserByIdOrEmail = async (req: Request): Promise<User> => {
   // Set function name for logs
-  const functionName = (i: number) => 'controller/user.ts : getUserById ' + i;
+  const functionName = (i: number) =>
+    'controller/user.ts : getUserByIdOrEmail ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   // Check param and token
-  if (typeof req.params.id !== 'string') {
+  if (typeof req.params.identifier !== 'string') {
     throw new AppError(CErrors.missingParameter);
-  } else if (req?.user?.id !== req.params.id) {
+  }
+  let result = await UserService.getUserFromIdSQL(req, req.params.identifier);
+  if (!result?.id) {
+    result = await UserService.getUserFromEmailSQL(req, req.params.identifier);
+  }
+
+  if (req?.user?.id !== result.id) {
     throw new AppError(CErrors.forbidden);
   }
-  const result = await UserService.getUserFromIdSQL(req, req.params.id);
 
   if (result.deleted_at) {
     throw new AppError(CErrors.userDeleted);
@@ -150,7 +156,7 @@ const create = async (req: Request): Promise<User> => {
   // Create user in DB
   const result = await UserService.createUserSQL(req, userSQL);
 
-  // send mail
+  // Send mail
   // await SendMails.sendCodeMail(req, result);
 
   return { id: result.id, email: result.email, username: result.username };
@@ -405,7 +411,7 @@ const updateSubs = async (req: Request): Promise<User> => {
 
 export default {
   getAll,
-  getUserById,
+  getUserByIdOrEmail,
   create,
   updatePassword,
   update,
