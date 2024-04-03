@@ -22,7 +22,9 @@ import SqlService from '../services/sql';
 
 const getUserPlatform = async (
   req: Request
-): Promise<PlatformAccountSQL & { cookies?: any; localStorag?: any; data?: any }> => {
+): Promise<
+  PlatformAccountSQL & { cookies?: any; localStorag?: any; data?: any }
+> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'controller/userPlatform.ts : getUserPlatform ' + i;
@@ -38,6 +40,7 @@ const getUserPlatform = async (
 
   // Create pool connection
   const pool = await SqlService.createPool(req);
+  Logger.info({ functionName: functionName(2) }, req);
 
   // Check user
   let user = await UserService.getUserFromIdSQL(req, req?.user?.id, pool);
@@ -47,11 +50,13 @@ const getUserPlatform = async (
   if (user.deleted_at) {
     throw new AppError(CErrors.userDeleted);
   }
+  Logger.info({ functionName: functionName(3) }, req);
 
   // Check if user have a current token
   if (user.token_end_date && (user.token_end_date as number) < Date.now()) {
     throw new AppError(CErrors.noCurrentToken);
   }
+  Logger.info({ functionName: functionName(4) }, req);
 
   // get user platforms for the user
   const userPlatforms = await UserPlatformService.getUserPlatformsFromUserSQL(
@@ -61,12 +66,14 @@ const getUserPlatform = async (
   if (!userPlatforms || userPlatforms.length === 0) {
     throw new AppError(CErrors.noUserPlatform);
   }
+  Logger.info({ functionName: functionName(5) }, req);
 
   // Find the good user platform
   const userPlatform = userPlatforms.find((e) => e.platform === platform);
   if (!userPlatform) {
     throw new AppError(CErrors.noUserPlatform);
   }
+  Logger.info({ functionName: functionName(6) }, req);
 
   // Get the platform account
   const platformAccount =
@@ -76,6 +83,7 @@ const getUserPlatform = async (
       pool
     );
   platformAccount.password = '';
+  Logger.info({ functionName: functionName(7) }, req);
 
   // Get the connexion cookies for the platform account
   const connexionData =
@@ -84,6 +92,7 @@ const getUserPlatform = async (
       platformAccount,
       pool
     );
+  Logger.info({ functionName: functionName(8) }, req);
 
   return { ...platformAccount, ...connexionData };
 };
