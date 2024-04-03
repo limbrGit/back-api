@@ -68,6 +68,8 @@ export const getUserPlatformsFromUserSQL = async (
       AND users_platforms.deleted_at IS NULL
     ;
   `;
+  Logger.info({ functionName: functionName(1), sql: sql, email: user.email }, req);
+
   const result: UserPlatformSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
