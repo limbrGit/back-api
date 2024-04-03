@@ -44,6 +44,7 @@ const sendSqlRequest = async (
   try {
     if (pool) {
       const [res] = await pool.query(sql, parameters);
+      Logger.info({ functionName: functionName(1), data: 'SQL POOL OK' }, req);
       return res;
     } else {
       const connection = await mysql2.createConnection({
