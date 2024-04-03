@@ -39,7 +39,7 @@ const sendSqlRequest = async (
   pool: Connection | null = null
 ): Promise<any> => {
   const functionName = (i: number) => 'services/sql.ts : sendSqlRequest ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+  Logger.info({ functionName: functionName(0), pool: !!pool }, req);
 
   try {
     if (pool) {
