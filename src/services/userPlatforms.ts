@@ -75,7 +75,8 @@ export const getUserPlatformsFromUserSQL = async (
     sql,
     [user.email],
     pool
-  );
+    );
+    Logger.info({ functionName: functionName(2), result: result }, req);
 
   return result;
 };
