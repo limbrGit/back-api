@@ -126,11 +126,17 @@ export const createPaymentOrder = async (
 export const getPaymentOrderFromOrderCode = async (
   req: Request,
   transaction: PaymentTransactionSQL
-): Promise<VivaPaymentOrder> => {
+): Promise<VivaPaymentOrder | null> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'services/vivawallet.ts : getPaymentOrderFromOrderCode ' + i;
-  Logger.info({ functionName: functionName(0) }, req);
+  Logger.info(
+    {
+      functionName: functionName(0),
+      vivawallet_order_code: transaction.vivawallet_order_code,
+    },
+    req
+  );
 
   // Create email in the mail server
   const response = await fetch(
@@ -143,6 +149,12 @@ export const getPaymentOrderFromOrderCode = async (
       },
     }
   );
+
+  Logger.info({ functionName: functionName(1), ok: response.ok }, req);
+
+  if (!response.ok) {
+    return null;
+  }
 
   // Get the result
   const data: VivaPaymentOrder = await response.json();

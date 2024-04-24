@@ -52,7 +52,8 @@ export const getAllPaymentTransactionFromUserSQL = async (
   const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [user.email], pool
+    [user.email],
+    pool
   );
 
   return result;
@@ -80,7 +81,8 @@ export const getPaymentTransactionFromIdSQL = async (
   const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [paymentTransactionId], pool
+    [paymentTransactionId],
+    pool
   );
 
   return result[0];
@@ -109,7 +111,8 @@ export const getPaymentTransactionFromVivawalletOrderCodeSQL = async (
   const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [vivawalletOrderCode], pool
+    [vivawalletOrderCode],
+    pool
   );
 
   return result[0];
@@ -141,11 +144,12 @@ export const createPaymentTransactionSQL = async (
     ;
   `;
 
-  const insertResult = await SqlService.sendSqlRequest(req, sql, [
-    id,
-    user.email,
-    paymentOfferName,
-  ], pool);
+  const insertResult = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [id, user.email, paymentOfferName],
+    pool
+  );
   if (insertResult.affectedRows === 0) {
     throw new AppError(CErrors.processing);
   }
@@ -190,10 +194,38 @@ export const updatePaymentTransactionSQL = async (
   return result;
 };
 
+export const getPaymentTransactionsInWaitingSQL = async (
+  req: Request,
+  pool: Connection | null = null
+): Promise<PaymentTransactionSQL[]> => {
+  const functionName = (i: number) =>
+    'services/paymentTransaction.ts : getPaymentTransactionsInWaitingSQL ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const sql = `
+    SELECT
+      ${columnsGettable}
+    FROM payment_transactions
+    WHERE
+      status = 'waiting' AND
+      deleted_at IS NULL
+    ;
+  `;
+  const result: PaymentTransactionSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [],
+    pool
+  );
+
+  return result;
+};
+
 export default {
   getAllPaymentTransactionFromUserSQL,
   getPaymentTransactionFromIdSQL,
   getPaymentTransactionFromVivawalletOrderCodeSQL,
   createPaymentTransactionSQL,
   updatePaymentTransactionSQL,
+  getPaymentTransactionsInWaitingSQL,
 };

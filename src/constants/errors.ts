@@ -139,6 +139,11 @@ const CErrors = {
     message: 'FORBIDDEN',
     detail: 'User not active',
   },
+  userNotAdmin: {
+    code: 403.8,
+    message: 'FORBIDDEN',
+    detail: 'User not admin',
+  },
 
   // 404
   notFound: {
