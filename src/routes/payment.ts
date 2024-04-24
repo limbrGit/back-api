@@ -17,7 +17,7 @@ const paymentApis = express.Router();
 // Check payment
 paymentApis.get(
   '/check/:vivawalletOfferCode',
-  authenticateToken,
+  // authenticateToken,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const functionName = 'GET on /payment/check/:vivawalletOfferCode';
     try {

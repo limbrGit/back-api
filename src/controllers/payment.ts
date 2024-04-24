@@ -29,6 +29,10 @@ import PaymentTransactionService from '../services/paymentTransaction';
 import VivawalletService from '../services/vivawallet';
 import dayjs from 'dayjs';
 
+// *****************
+// startPayment
+// *****************
+
 const startPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Set function name for logs
   const functionName = (i: number) => 'controller/list.ts : startPayment ' + i;
@@ -93,6 +97,10 @@ const startPayment = async (req: Request): Promise<PaymentTransaction> => {
   return transaction;
 };
 
+// *****************
+// checkPayment
+// *****************
+
 const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Set function name for logs
   const functionName = (i: number) => 'controller/list.ts : checkPayment ' + i;
@@ -105,14 +113,6 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.missingParameter);
   }
 
-  // Check user
-  let user = await UserService.getUserFromIdSQL(req, req?.user?.id);
-  if (!user) {
-    throw new AppError(CErrors.userNotFound);
-  }
-  if (user.deleted_at) {
-    throw new AppError(CErrors.userDeleted);
-  }
   Logger.info({ functionName: functionName(1) }, req);
 
   // Get transaction
@@ -129,6 +129,17 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   }
 
   Logger.info({ functionName: functionName(2) }, req);
+
+  // Check user
+  let user = await UserService.getUserFromEmailSQL(req, transaction.user_email);
+  if (!user) {
+    throw new AppError(CErrors.userNotFound);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+
+  Logger.info({ functionName: functionName(3) }, req);
   // Check Vivawallet payment order
   const vivawalletPaymentOrder =
     await VivawalletService.getPaymentOrderFromOrderCode(req, transaction);
@@ -136,7 +147,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.vivawalletGetPaymentOrder);
   }
 
-  Logger.info({ functionName: functionName(3) }, req);
+  Logger.info({ functionName: functionName(4) }, req);
   // Get new status
   const getNewStatus = (stateId: number): PaymentTransactionStatus => {
     if (stateId === 0) {
@@ -152,7 +163,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   };
   const newStatus = getNewStatus(vivawalletPaymentOrder.StateId);
 
-  Logger.info({ functionName: functionName(4) }, req);
+  Logger.info({ functionName: functionName(5) }, req);
   // If transaction is paid
   if (newStatus === PaymentTransactionStatus.Paid) {
     // Get offer
@@ -164,7 +175,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       throw new AppError(CErrors.offerNotFound);
     }
 
-    Logger.info({ functionName: functionName(5) }, req);
+    Logger.info({ functionName: functionName(6) }, req);
     // Update user in DB with new tokens
     user = await UserService.updateUserSQL(req, {
       ...user,
@@ -179,7 +190,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     }
   }
 
-  Logger.info({ functionName: functionName(6) }, req);
+  Logger.info({ functionName: functionName(7) }, req);
   // Update transaction
   transaction = await PaymentTransactionService.updatePaymentTransactionSQL(
     req,
@@ -188,7 +199,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       status: newStatus,
     }
   );
-  Logger.info({ functionName: functionName(7) }, req);
+  Logger.info({ functionName: functionName(8) }, req);
 
   // Return temporary just to send the link
   return transaction;
