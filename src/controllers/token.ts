@@ -32,7 +32,7 @@ const useOneToken = async (req: Request): Promise<UserSQL> => {
   }
 
   // Check if user have a current token
-  if (user.token_end_date && user.token_end_date as number > Date.now()) {
+  if (user.token_end_date && (user.token_end_date as number) > Date.now()) {
     throw new AppError(CErrors.currentTokenAlreadyUsed);
   }
 

@@ -183,7 +183,7 @@ export const updateUserSQL = async (
     UPDATE users
     SET
       username = '${userSQL.username}',
-      ${userSQL.tokens ? 'tokens = ' + userSQL.tokens + ',' : ''}
+      ${userSQL.tokens !== undefined ? 'tokens = ' + userSQL.tokens + ',' : ''}
       ${
         userSQL.token_end_date
           ? "token_end_date = '" + userSQL.token_end_date + "',"
