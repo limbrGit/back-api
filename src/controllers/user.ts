@@ -27,6 +27,7 @@ import AppError from '../classes/AppError';
 // Services
 import UserService from '../services/user';
 import SendMails from '../services/sendMails';
+import UserAssignmentService from '../services/userAssignment';
 
 dayjs.extend(customParseFormat);
 
@@ -105,7 +106,7 @@ const create = async (req: Request): Promise<User> => {
   Logger.info({ functionName: functionName(0) }, req);
 
   // Check params
-  const { email, password, username, subs } = req.body;
+  const { email, password, username, subs, assignmentFrom } = req.body;
   if (!email || !password) {
     throw new AppError(CErrors.missingParameter);
   }
@@ -173,10 +174,28 @@ const create = async (req: Request): Promise<User> => {
           .map((e) => e[0])
           .toString()
       : null,
+    assignmentFrom: assignmentFrom?.substring(0, 20),
   };
 
   // Create user in DB
-  const result = await UserService.createUserSQL(req, userSQL);
+  let result = await UserService.createUserSQL(req, userSQL);
+
+  if (assignmentFrom) {
+    // Get user assignment from name
+    const userAssignment = await UserAssignmentService.getByNameSQL(
+      req,
+      assignmentFrom
+    );
+
+    if (userAssignment?.tokens_free) {
+      // update user in DB
+      result = await UserService.updateUserSQL(req, {
+        id: result.id,
+        username: result.username,
+        tokens: userAssignment.tokens_free,
+      });
+    }
+  }
 
   // Send mail
   // await SendMails.sendCodeMail(req, result);

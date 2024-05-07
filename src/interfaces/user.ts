@@ -52,6 +52,7 @@ export interface UserSQL extends User {
   // description?: string | null;
   // picture?: string | null;
   // subs: string | null;
+  assignmentFrom: string | null;
   created_at: number;
   updated_at: number;
   deleted_at: number | null;

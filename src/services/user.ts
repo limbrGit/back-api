@@ -35,6 +35,7 @@ const columnsGettable = `
   description,
   picture,
   subs,
+  assignment_from,
   created_at,
   updated_at,
   deleted_at
@@ -144,24 +145,34 @@ export const createUserSQL = async (
       salt,
       confirmation_code,
       subs,
-      created_at,
-      updated_at,
-      deleted_at
+      assignment_from
     )
     VALUES (
-      '${userSQL.id}',
-      '${userSQL.email}',
-      '${userSQL.username}',
-      '${userSQL.hash}',
-      '${userSQL.salt}',
-      '${userSQL.confirmation_code}',
-      ${userSQL.subs ? "'" + userSQL.subs + "'" : 'NULL'},
-      NOW(),
-      NOW(),
-      NULL
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?
     );
   `;
-  const insertResult = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const insertResult = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [
+      userSQL.id,
+      userSQL.email,
+      userSQL.username,
+      userSQL.hash,
+      userSQL.salt,
+      userSQL.confirmation_code,
+      userSQL.subs || null,
+      userSQL.assignmentFrom || null,
+    ],
+    pool
+  );
   if (insertResult.affectedRows !== 1) {
     throw new AppError(CErrors.processing);
   }
@@ -182,7 +193,6 @@ export const updateUserSQL = async (
   const sql = `
     UPDATE users
     SET
-      username = '${userSQL.username}',
       ${userSQL.tokens !== undefined ? 'tokens = ' + userSQL.tokens + ',' : ''}
       ${
         userSQL.token_end_date
@@ -204,7 +214,7 @@ export const updateUserSQL = async (
           : ''
       }
       ${userSQL.subs ? "subs = '" + userSQL.subs + "'," : ''}
-      updated_at = NOW()
+      username = '${userSQL.username}'
     WHERE
       users.id = '${userSQL.id}'
   `;
@@ -228,7 +238,8 @@ export const changePasswordUserSQL = async (
   hash: string,
   pool: Connection | null = null
 ): Promise<UserSQL> => {
-  const functionName = (i: number) => 'services/user.ts : changePasswordUserSQL ' + i;
+  const functionName = (i: number) =>
+    'services/user.ts : changePasswordUserSQL ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const sql = `
@@ -309,7 +320,6 @@ export const deleteUserSQL = async (
   return result;
 };
 
-
 export const getUserFromIdWithAdminSQL = async (
   req: Request,
   id: string,
@@ -334,7 +344,6 @@ export const getUserFromIdWithAdminSQL = async (
   return result[0];
 };
 
-
 export default {
   getAllUserSQL,
   getUserFromUsernameSQL,
@@ -345,5 +354,5 @@ export default {
   changePasswordUserSQL,
   valideConfirmationCode,
   deleteUserSQL,
-  getUserFromIdWithAdminSQL
+  getUserFromIdWithAdminSQL,
 };
