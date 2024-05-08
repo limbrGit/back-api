@@ -24,6 +24,7 @@ export interface User {
   description?: string | null;
   picture?: string | null;
   subs?: string[] | string;
+  marketing?: string | null;
   admin?: boolean;
 }
 

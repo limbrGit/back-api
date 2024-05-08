@@ -106,7 +106,14 @@ const create = async (req: Request): Promise<User> => {
   Logger.info({ functionName: functionName(0) }, req);
 
   // Check params
-  const { email, password, username, subs, assignmentFrom } = req.body;
+  const {
+    email,
+    password,
+    username,
+    subs,
+    assignmentFrom,
+    marketing = false,
+  } = req.body;
   if (!email || !password) {
     throw new AppError(CErrors.missingParameter);
   }
@@ -175,6 +182,7 @@ const create = async (req: Request): Promise<User> => {
           .toString()
       : null,
     assignmentFrom: assignmentFrom?.substring(0, 20),
+    marketing: marketing ? dayjs().format('YYYY-MM-DD HH:mm:ss') : null,
   };
 
   // Create user in DB

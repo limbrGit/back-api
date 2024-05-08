@@ -145,9 +145,11 @@ export const createUserSQL = async (
       salt,
       confirmation_code,
       subs,
-      assignment_from
+      assignment_from,
+      marketing
     )
     VALUES (
+      ?,
       ?,
       ?,
       ?,
@@ -170,6 +172,7 @@ export const createUserSQL = async (
       userSQL.confirmation_code,
       userSQL.subs || null,
       userSQL.assignmentFrom || null,
+      userSQL.marketing
     ],
     pool
   );
