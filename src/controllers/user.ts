@@ -195,7 +195,7 @@ const create = async (req: Request): Promise<User> => {
       assignmentFrom
     );
 
-    if (userAssignment?.tokens_free) {
+    if (userAssignment && userAssignment.deleted_at === null) {
       // update user in DB
       result = await UserService.updateUserSQL(req, {
         id: result.id,
