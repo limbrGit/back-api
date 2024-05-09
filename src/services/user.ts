@@ -204,19 +204,19 @@ export const updateUserSQL = async (
       }
       ${
         userSQL.firstname
-          ? "firstname = '" + userSQL.firstname?.replace("'", "\\'") + "',"
+          ? "firstname = '" + userSQL.firstname?.replaceAll("'", "\\'") + "',"
           : ''
       }
       ${
         userSQL.lastname
-          ? "lastname = '" + userSQL.lastname?.replace("'", "\\'") + "',"
+          ? "lastname = '" + userSQL.lastname?.replaceAll("'", "\\'") + "',"
           : ''
       }
       ${userSQL.birthdate ? "birthdate = '" + userSQL.birthdate + "'," : ''}
       ${userSQL.gender ? "gender = '" + userSQL.gender + "'," : ''}
       ${
         userSQL.description
-          ? "description = '" + userSQL.description?.replace("'", "\\'") + "',"
+          ? "description = '" + userSQL.description?.replaceAll("'", "\\'") + "',"
           : ''
       }
       ${
