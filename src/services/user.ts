@@ -172,7 +172,7 @@ export const createUserSQL = async (
       userSQL.confirmation_code,
       userSQL.subs || null,
       userSQL.assignmentFrom || null,
-      userSQL.marketing
+      userSQL.marketing,
     ],
     pool
   );
@@ -202,13 +202,21 @@ export const updateUserSQL = async (
           ? "token_end_date = '" + userSQL.token_end_date + "',"
           : ''
       }
-      ${userSQL.firstname ? "firstname = '" + userSQL.firstname + "'," : ''}
-      ${userSQL.lastname ? "lastname = '" + userSQL.lastname + "'," : ''}
+      ${
+        userSQL.firstname
+          ? "firstname = '" + userSQL.firstname?.replace("'", "\\'") + "',"
+          : ''
+      }
+      ${
+        userSQL.lastname
+          ? "lastname = '" + userSQL.lastname?.replace("'", "\\'") + "',"
+          : ''
+      }
       ${userSQL.birthdate ? "birthdate = '" + userSQL.birthdate + "'," : ''}
       ${userSQL.gender ? "gender = '" + userSQL.gender + "'," : ''}
       ${
         userSQL.description
-          ? "description = '" + userSQL.description + "',"
+          ? "description = '" + userSQL.description?.replace("'", "\\'") + "',"
           : ''
       }
       ${
