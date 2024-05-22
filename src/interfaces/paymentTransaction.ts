@@ -13,6 +13,7 @@ export enum PaymentTransactionStatus {
 export interface PaymentTransaction {
   user_email: string;
   payment_offer_name: PaymentOfferName;
+  promo_code: string | null;
   status: PaymentTransactionStatus;
   vivawallet_order_code?: string | null;
 }

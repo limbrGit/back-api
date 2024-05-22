@@ -10,7 +10,7 @@ import { ENV_DEV } from '../constants/environement';
 dotenv.config();
 
 const config: Config = {
-  env: process.env.ENV || ENV_DEV,
+  env: process.env.NODE_ENV || ENV_DEV,
   port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
   serverName: process.env.SERVER_NAME || 'back-api',
   delay: process.env.DELAY ? parseInt(process.env.DELAY) : 100, // 130 in prod
@@ -78,15 +78,32 @@ const config: Config = {
   },
 
   vivawallet: {
-    siteCode: process.env.VIVAWALLET_SITE_CODE_PROD || '6271',
+    siteCode:
+      (process.env.NODE_ENV?.toLowerCase() === ENV_DEV?.toLowerCase()
+        ? process.env.VIVAWALLET_SITE_CODE_DEMO
+        : process.env.VIVAWALLET_SITE_CODE_PROD) || '6271',
     paymentUrl:
-      process.env.VIVAWALLET_PAYMENT_URL_PROD || 'demo-api.vivapayments.com',
+      (process.env.NODE_ENV?.toLowerCase() === ENV_DEV?.toLowerCase()
+        ? process.env.VIVAWALLET_PAYMENT_URL_DEMO
+        : process.env.VIVAWALLET_PAYMENT_URL_PROD) ||
+      'demo-api.vivapayments.com',
     accountUrl:
-      process.env.VIVAWALLET_ACCOUNT_URL_PROD ||
+      (process.env.NODE_ENV?.toLowerCase() === ENV_DEV?.toLowerCase()
+        ? process.env.VIVAWALLET_ACCOUNT_URL_DEMO
+        : process.env.VIVAWALLET_ACCOUNT_URL_PROD) ||
       'demo-accounts.vivapayments.com',
-    orderUrl: process.env.VIVAWALLET_ORDER_URL_PROD || 'demo.vivapayments.com',
-    orderBasicAuth: process.env.VIVAWALLET_ORDER_BASIC_AUTH_PROD!,
-    loginBasicAuth: process.env.VIVAWALLET_LOGIN_BASIC_AUTH_PROD!,
+    orderUrl:
+      (process.env.NODE_ENV?.toLowerCase() === ENV_DEV?.toLowerCase()
+        ? process.env.VIVAWALLET_ORDER_URL_DEMO
+        : process.env.VIVAWALLET_ORDER_URL_PROD) || 'demo.vivapayments.com',
+    orderBasicAuth:
+      process.env.NODE_ENV?.toLowerCase() === ENV_DEV?.toLowerCase()
+        ? process.env.VIVAWALLET_ORDER_BASIC_AUTH_DEMO!
+        : process.env.VIVAWALLET_ORDER_BASIC_AUTH_PROD!,
+    loginBasicAuth:
+      process.env.NODE_ENV?.toLowerCase() === ENV_DEV?.toLowerCase()
+        ? process.env.VIVAWALLET_LOGIN_BASIC_AUTH_DEMO!
+        : process.env.VIVAWALLET_LOGIN_BASIC_AUTH_PROD!,
   },
 
   notifications: {

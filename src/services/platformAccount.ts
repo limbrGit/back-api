@@ -148,11 +148,16 @@ export const getPlatformAccountFromEmail = async (
       ${columnsGettable}
     FROM platform_accounts
     WHERE
-      platform_accounts.email = "${email}"
+      LOWER(platform_accounts.email) = ?
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [email.toLowerCase()],
+    pool
+  );
 
   const PlatformAccount = {
     ...result[0],

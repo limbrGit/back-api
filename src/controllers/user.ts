@@ -294,6 +294,7 @@ const update = async (req: Request): Promise<User> => {
     description,
     picture,
     subs,
+    marketing,
   }: UpdateBody = req.body;
   if (
     !username &&
@@ -303,7 +304,8 @@ const update = async (req: Request): Promise<User> => {
     !gender &&
     !description &&
     !picture &&
-    !subs
+    !subs &&
+    typeof marketing !== 'boolean'
   ) {
     throw new AppError(CErrors.missingParameter);
   }
@@ -365,6 +367,12 @@ const update = async (req: Request): Promise<User> => {
           .map((e) => e[0])
           .toString()
       : null,
+    marketing:
+      typeof marketing !== 'boolean'
+        ? undefined
+        : marketing
+        ? dayjs().format('YYYY-MM-DD HH:mm:ss')
+        : null,
   };
 
   // Create user in DB

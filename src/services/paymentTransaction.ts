@@ -24,6 +24,7 @@ const columnsGettable = `
   id,
   user_email,
   payment_offer_name,
+  promo_code,
   status,
   vivawallet_order_code,
   created_at,
@@ -114,6 +115,7 @@ export const getPaymentTransactionFromVivawalletOrderCodeSQL = async (
     [vivawalletOrderCode],
     pool
   );
+  Logger.info({ functionName: functionName(1), result: result[0] }, req);
 
   return result[0];
 };
@@ -122,6 +124,7 @@ export const createPaymentTransactionSQL = async (
   req: Request,
   user: UserSQL | User,
   paymentOfferName: PaymentOfferName,
+  promoCode: string | null = null,
   pool: Connection | null = null
 ): Promise<PaymentTransactionSQL> => {
   const functionName = (i: number) =>
@@ -134,9 +137,11 @@ export const createPaymentTransactionSQL = async (
     INSERT INTO payment_transactions (
       id,
       user_email,
-      payment_offer_name
+      payment_offer_name,
+      promo_code
     )
     VALUES (
+      ?,
       ?,
       ?,
       ?
@@ -147,7 +152,7 @@ export const createPaymentTransactionSQL = async (
   const insertResult = await SqlService.sendSqlRequest(
     req,
     sql,
-    [id, user.email, paymentOfferName],
+    [id, user.email, paymentOfferName, promoCode],
     pool
   );
   if (insertResult.affectedRows === 0) {

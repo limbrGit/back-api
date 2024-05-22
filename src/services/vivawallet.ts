@@ -14,6 +14,10 @@ import {
   VivaPaymentOrder,
   VivaPaymentOrderCreation,
 } from '../interfaces/vivawallet';
+import {
+  PaymentPromoCodeSQL,
+  PaymentOffersValues,
+} from '../interfaces/paymentPromoCode';
 
 // Tools
 import Logger from '../tools/logger';
@@ -64,7 +68,8 @@ export const createPaymentOrder = async (
   req: Request,
   user: UserSQL | User,
   offer: PaymentOfferSQL,
-  transaction: PaymentTransactionSQL
+  transaction: PaymentTransactionSQL,
+  promoCode: PaymentPromoCodeSQL | null
 ): Promise<VivaPaymentOrderCreation> => {
   // Set function name for logs
   const functionName = (i: number) =>
@@ -75,8 +80,20 @@ export const createPaymentOrder = async (
 
   // Set the body for the API call
   const body = {
-    amount: offer.pricing * 100,
-    customerTrns: `Limbr ${offer.tokens} crédits`,
+    amount:
+      (offer.pricing -
+        (promoCode && Object.keys(promoCode.discount).includes(offer.name)
+          ? (promoCode.discount as PaymentOffersValues)[offer.name]
+          : 0)) *
+      100,
+    customerTrns: `Limbr ${offer.tokens} crédits${
+      promoCode && Object.keys(promoCode.tokens).includes(offer.name)
+        ? ' + ' +
+          (promoCode.tokens as PaymentOffersValues)[offer.name] +
+          ' offerts avec le code : ' +
+          promoCode.name
+        : ''
+    }`,
     customer: {
       email: user.email,
       fullName: [user.firstname, user.lastname].join(' '),
@@ -96,7 +113,15 @@ export const createPaymentOrder = async (
     disableWallet: false,
     sourceCode: config.vivawallet.siteCode,
     merchantTrns: transaction.id,
-    tags: ['limbr', 'pack ' + offer.name],
+    tags: [
+      'limbr',
+      'pack ' + offer.name,
+      promoCode &&
+      (Object.keys(promoCode.discount).includes(offer.name) ||
+        Object.keys(promoCode.tokens).includes(offer.name))
+        ? 'code ' + promoCode.name
+        : undefined,
+    ],
     isCardVerification: false,
   };
 

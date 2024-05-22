@@ -79,4 +79,5 @@ export interface UpdateBody {
   description?: string;
   picture?: string;
   subs?: string | string[];
+  marketing?: boolean;
 }

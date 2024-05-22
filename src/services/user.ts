@@ -34,6 +34,7 @@ const columnsGettable = `
   gender,
   description,
   picture,
+  marketing,
   subs,
   assignment_from,
   created_at,
@@ -216,7 +217,9 @@ export const updateUserSQL = async (
       ${userSQL.gender ? "gender = '" + userSQL.gender + "'," : ''}
       ${
         userSQL.description
-          ? "description = '" + userSQL.description?.replaceAll("'", "\\'") + "',"
+          ? "description = '" +
+            userSQL.description?.replaceAll("'", "\\'") +
+            "',"
           : ''
       }
       ${
@@ -225,6 +228,8 @@ export const updateUserSQL = async (
           : ''
       }
       ${userSQL.subs ? "subs = '" + userSQL.subs + "'," : ''}
+      ${typeof userSQL.marketing === "string" ? "marketing = '" + userSQL.marketing + "'," : ''}
+      ${userSQL.marketing === null ? "marketing = NULL," : ''}
       username = '${userSQL.username}'
     WHERE
       users.id = '${userSQL.id}'

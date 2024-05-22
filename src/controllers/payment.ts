@@ -1,5 +1,6 @@
 // Imports
 import { Request } from 'express';
+import dayjs from 'dayjs';
 
 // Interfaces
 import { PaymentOfferName } from '../interfaces/paymentOffer';
@@ -13,6 +14,10 @@ import {
   VivaPaymentOrderCreation,
 } from '../interfaces/vivawallet';
 import { IError } from '../interfaces/errors';
+import {
+  PaymentPromoCodeSQL,
+  PaymentOffersValues,
+} from '../interfaces/paymentPromoCode';
 
 // Tools
 import Logger from '../tools/logger';
@@ -25,10 +30,11 @@ import AppError from '../classes/AppError';
 
 // Services
 import UserService from '../services/user';
+import PaymentPromoCode from '../services/paymentPromoCode';
 import PaymentOfferService from '../services/paymentOffer';
 import PaymentTransactionService from '../services/paymentTransaction';
 import VivawalletService from '../services/vivawallet';
-import dayjs from 'dayjs';
+import SqlService from '../services/sql';
 
 // *****************
 // startPayment
@@ -36,19 +42,25 @@ import dayjs from 'dayjs';
 
 const startPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Set function name for logs
-  const functionName = (i: number) => 'controller/list.ts : startPayment ' + i;
+  const functionName = (i: number) =>
+    'controller/payment.ts : startPayment ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const { paymentOfferName }: { paymentOfferName?: PaymentOfferName } =
     req.params;
+  const { code }: { code?: string } = req.query;
 
   // Check param and token
   if (!paymentOfferName) {
     throw new AppError(CErrors.missingParameter);
   }
 
+  // Create pool connection
+  const pool = await SqlService.createPool(req);
+  Logger.info({ functionName: functionName(2) }, req);
+
   // Check user
-  const user = await UserService.getUserFromIdSQL(req, req?.user?.id);
+  const user = await UserService.getUserFromIdSQL(req, req?.user?.id, pool);
   if (!user) {
     throw new AppError(CErrors.userNotFound);
   }
@@ -59,7 +71,8 @@ const startPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Check offer
   const offer = await PaymentOfferService.getPaymentOfferFromIdSQL(
     req,
-    paymentOfferName
+    paymentOfferName,
+    pool
   );
   if (!offer) {
     throw new AppError(CErrors.offerNotFound);
@@ -68,17 +81,35 @@ const startPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.offerDeleted);
   }
 
+  // Check code promo
+  let promoCode: PaymentPromoCodeSQL | null = null;
+  if (code) {
+    promoCode = await PaymentPromoCode.getPaymentPromoCodeByNameSQL(
+      req,
+      code,
+      pool
+    );
+  }
+
   // Create transaction
   let transaction: PaymentTransactionSQL =
     await PaymentTransactionService.createPaymentTransactionSQL(
       req,
       user,
-      paymentOfferName
+      paymentOfferName,
+      promoCode?.name,
+      pool
     );
 
   // Create a Vivawallet payment order
   const vivaPaymentOrder: VivaPaymentOrderCreation =
-    await VivawalletService.createPaymentOrder(req, user, offer, transaction);
+    await VivawalletService.createPaymentOrder(
+      req,
+      user,
+      offer,
+      transaction,
+      promoCode
+    );
   Logger.info({ functionName: functionName(1), vivaPaymentOrder }, req);
   if (!vivaPaymentOrder) {
     throw new AppError(CErrors.vivawalletCreatePaymentOrder);
@@ -104,17 +135,22 @@ const startPayment = async (req: Request): Promise<PaymentTransaction> => {
 
 const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Set function name for logs
-  const functionName = (i: number) => 'controller/list.ts : checkPayment ' + i;
+  const functionName = (i: number) =>
+    'controller/payment.ts : checkPayment ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   const { vivawalletOfferCode }: { vivawalletOfferCode?: string } = req.params;
+  Logger.info(
+    { functionName: functionName(1), vivawalletOfferCode: vivawalletOfferCode },
+    req
+  );
 
   // Check param and token
   if (!vivawalletOfferCode) {
     throw new AppError(CErrors.missingParameter);
   }
 
-  Logger.info({ functionName: functionName(1) }, req);
+  Logger.info({ functionName: functionName(2) }, req);
 
   // Get transaction
   let transaction: PaymentTransactionSQL =
@@ -125,11 +161,13 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   if (!transaction) {
     throw new AppError(CErrors.transactionNotFound);
   }
-  if (transaction.status !== PaymentTransactionStatus.Waiting) {
+  if (transaction.status === PaymentTransactionStatus.Paid) {
+    return transaction;
+  } else if (transaction.status !== PaymentTransactionStatus.Waiting) {
     throw new AppError(CErrors.transactionOver);
   }
 
-  Logger.info({ functionName: functionName(2) }, req);
+  Logger.info({ functionName: functionName(3), transaction: transaction }, req);
 
   // Check user
   let user = await UserService.getUserFromEmailSQL(req, transaction.user_email);
@@ -140,7 +178,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.userDeleted);
   }
 
-  Logger.info({ functionName: functionName(3) }, req);
+  Logger.info({ functionName: functionName(4) }, req);
 
   // Check Vivawallet payment order
   const vivawalletPaymentOrder =
@@ -149,7 +187,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     throw new AppError(CErrors.vivawalletGetPaymentOrder);
   }
 
-  Logger.info({ functionName: functionName(4) }, req);
+  Logger.info({ functionName: functionName(5) }, req);
   // Get new status
   const getNewStatus = (stateId: number): PaymentTransactionStatus => {
     if (stateId === 0) {
@@ -165,7 +203,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
   };
   const newStatus = getNewStatus(vivawalletPaymentOrder.StateId);
 
-  Logger.info({ functionName: functionName(5) }, req);
+  Logger.info({ functionName: functionName(6) }, req);
   // If transaction is paid
   if (newStatus === PaymentTransactionStatus.Paid) {
     // Get offer
@@ -177,12 +215,26 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       throw new AppError(CErrors.offerNotFound);
     }
 
-    Logger.info({ functionName: functionName(6) }, req);
+    // Get promo code
+    let promoCode = null;
+    if (transaction.promo_code) {
+      promoCode = await PaymentPromoCode.getPaymentPromoCodeByNameSQL(
+        req,
+        transaction.promo_code
+      );
+    }
+
+    Logger.info({ functionName: functionName(7) }, req);
     // Update user in DB with new tokens
     user = await UserService.updateUserSQL(req, {
       ...user,
       birthdate: undefined,
-      tokens: user.tokens + offer.tokens,
+      tokens:
+        user.tokens +
+        offer.tokens +
+        (promoCode && Object.keys(promoCode.tokens).includes(offer.name)
+          ? (promoCode.tokens as PaymentOffersValues)[offer.name]
+          : 0),
       token_end_date: user.token_end_date
         ? dayjs(user.token_end_date).format('YYYY-MM-DD HH:mm:ss')
         : null,
@@ -192,7 +244,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     }
   }
 
-  Logger.info({ functionName: functionName(7) }, req);
+  Logger.info({ functionName: functionName(8) }, req);
   // Update transaction
   transaction = await PaymentTransactionService.updatePaymentTransactionSQL(
     req,
@@ -201,7 +253,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
       status: newStatus,
     }
   );
-  Logger.info({ functionName: functionName(8) }, req);
+  Logger.info({ functionName: functionName(9) }, req);
 
   // Return temporary just to send the link
   return transaction;
@@ -216,7 +268,7 @@ const checkAllPayments = async (
 ): Promise<PaymentTransaction[]> => {
   // Set function name for logs
   const functionName = (i: number) =>
-    'controller/list.ts : checkAllPayments ' + i;
+    'controller/payment.ts : checkAllPayments ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
   // Check user admin
