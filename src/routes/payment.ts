@@ -14,6 +14,22 @@ import PaymentController from '../controllers/payment';
 
 const paymentApis = express.Router();
 
+// Check promo code
+paymentApis.get(
+  '/promoCode/:code',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /payment/promoCode/:code';
+    try {
+      Logger.info({ functionName: functionName }, req);
+      const result = await PaymentController.checkPromoCode(req);
+      res.json(result);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
+    }
+  })
+);
+
 // Check payment
 paymentApis.get(
   '/check/all',

@@ -144,6 +144,11 @@ const CErrors = {
     message: 'FORBIDDEN',
     detail: 'User not admin',
   },
+  promoCodeDeleted: {
+    code: 403.5,
+    message: 'FORBIDDEN',
+    detail: 'Promo code deleted',
+  },
 
   // 404
   notFound: {
@@ -167,15 +172,22 @@ const CErrors = {
     detail: 'Content not in list',
   },
   offerNotFound: {
-    code: 404.2,
+    code: 404.5,
     message: 'NOT FOUND',
     detail: 'Offer not found',
   },
   transactionNotFound: {
-    code: 404.3,
+    code: 404.6,
     message: 'NOT FOUND',
     detail: 'Transaction not found',
   },
+  promoCodeNotFound: {
+    code: 404.7,
+    message: 'NOT FOUND',
+    detail: 'Promo code not found',
+  },
+
+  // 409
   EmailAlreadyExist: {
     code: 409.1,
     message: 'CONFLICT',

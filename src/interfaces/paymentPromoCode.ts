@@ -8,6 +8,8 @@ export interface PaymentPromoCode {
   name: string;
   tokens: PaymentOffersValues | string;
   discount: PaymentOffersValues | string;
+  start_date: string | null;
+  end_date: string | null;
   description: string | null;
 }
 

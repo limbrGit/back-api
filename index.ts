@@ -26,6 +26,7 @@ import userPlatformRoutes from './src/routes/userPlatform';
 import supportRoutes from './src/routes/support';
 import cardRoutes from './src/routes/card';
 import notificationRoutes from './src/routes/notification';
+import { exec } from 'child_process';
 
 // Tools
 import Logger from './src/tools/logger';
@@ -74,6 +75,7 @@ app.get(
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
       Logger.info({ functionName: 'Get on /' }, req);
+      exec('find /logs -name "*.log" -type f -mtime +10 -delete');
       const connectioDB = await TestConnectionDBService.textConnectionDB(req);
       if (connectioDB.valid) {
         res

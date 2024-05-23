@@ -16,6 +16,8 @@ const columnsGettable = `
   name,
   tokens,
   discount,
+  start_date,
+  end_date,
   created_at,
   updated_at,
   deleted_at
@@ -36,6 +38,8 @@ export const getPaymentPromoCodeByNameSQL = async (
     FROM payment_promo_code
     WHERE
       name = ? AND
+      (start_date < NOW() OR start_date IS NULL) AND
+      (end_date > NOW() OR end_date IS NULL) AND
       deleted_at IS NULL
     LIMIT 1
     ;

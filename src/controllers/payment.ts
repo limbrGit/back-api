@@ -17,6 +17,7 @@ import { IError } from '../interfaces/errors';
 import {
   PaymentPromoCodeSQL,
   PaymentOffersValues,
+  PaymentPromoCode,
 } from '../interfaces/paymentPromoCode';
 
 // Tools
@@ -30,7 +31,7 @@ import AppError from '../classes/AppError';
 
 // Services
 import UserService from '../services/user';
-import PaymentPromoCode from '../services/paymentPromoCode';
+import PaymentPromoCodeService from '../services/paymentPromoCode';
 import PaymentOfferService from '../services/paymentOffer';
 import PaymentTransactionService from '../services/paymentTransaction';
 import VivawalletService from '../services/vivawallet';
@@ -84,7 +85,7 @@ const startPayment = async (req: Request): Promise<PaymentTransaction> => {
   // Check code promo
   let promoCode: PaymentPromoCodeSQL | null = null;
   if (code) {
-    promoCode = await PaymentPromoCode.getPaymentPromoCodeByNameSQL(
+    promoCode = await PaymentPromoCodeService.getPaymentPromoCodeByNameSQL(
       req,
       code,
       pool
@@ -218,7 +219,7 @@ const checkPayment = async (req: Request): Promise<PaymentTransaction> => {
     // Get promo code
     let promoCode = null;
     if (transaction.promo_code) {
-      promoCode = await PaymentPromoCode.getPaymentPromoCodeByNameSQL(
+      promoCode = await PaymentPromoCodeService.getPaymentPromoCodeByNameSQL(
         req,
         transaction.promo_code
       );
@@ -404,8 +405,60 @@ const checkAllPayments = async (
   return transactionResult;
 };
 
+// *****************
+// checkPromoCode
+// *****************
+
+const checkPromoCode = async (req: Request): Promise<PaymentPromoCode> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'controller/payment.ts : checkPromoCode ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  const { code }: { code?: string } = req.params;
+  Logger.info({ functionName: functionName(1), code: code }, req);
+
+  // Check param and token
+  if (!code) {
+    throw new AppError(CErrors.missingParameter);
+  }
+
+  Logger.info({ functionName: functionName(2) }, req);
+
+  // Check user admin
+  const user = await UserService.getUserFromIdWithAdminSQL(req, req?.user?.id);
+  if (!user) {
+    throw new AppError(CErrors.userNotFound);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+
+  Logger.info({ functionName: functionName(3) }, req);
+
+  // Check promo code
+  const promoCode = await PaymentPromoCodeService.getPaymentPromoCodeByNameSQL(
+    req,
+    code
+  );
+  if (!promoCode) {
+    throw new AppError(CErrors.promoCodeNotFound);
+  }
+  if (promoCode.deleted_at) {
+    throw new AppError(CErrors.promoCodeDeleted);
+  }
+
+  return {
+    ...promoCode,
+    id: undefined,
+    created_at: undefined,
+    updated_at: undefined,
+    deleted_at: undefined,
+  };
+};
 export default {
   startPayment,
   checkPayment,
   checkAllPayments,
+  checkPromoCode,
 };
