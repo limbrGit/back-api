@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import asyncHandler from 'express-async-handler';
 import cors from 'cors';
+import { exec } from 'child_process';
 
 // Config
 import config from './src/configs/config';
@@ -26,7 +27,7 @@ import userPlatformRoutes from './src/routes/userPlatform';
 import supportRoutes from './src/routes/support';
 import cardRoutes from './src/routes/card';
 import notificationRoutes from './src/routes/notification';
-import { exec } from 'child_process';
+import adminRoutes from './src/routes/admin';
 
 // Tools
 import Logger from './src/tools/logger';
@@ -68,6 +69,7 @@ app.use('/userPlatform', userPlatformRoutes);
 app.use('/support', supportRoutes);
 app.use('/card', cardRoutes);
 app.use('/notification', notificationRoutes);
+app.use('/admin', adminRoutes);
 
 // Check Service
 app.get(

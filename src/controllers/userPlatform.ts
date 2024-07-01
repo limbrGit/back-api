@@ -20,6 +20,10 @@ import UserPlatformService from '../services/userPlatforms';
 import PlatformAccountService from '../services/platformAccount';
 import SqlService from '../services/sql';
 
+// ###############
+// getUserPlatform
+// ###############
+
 const getUserPlatform = async (
   req: Request
 ): Promise<
@@ -96,6 +100,10 @@ const getUserPlatform = async (
 
   return { ...platformAccount, ...connexionData };
 };
+
+// ##################
+// getUserPlatformOtp
+// ##################
 
 const getUserPlatformOtp = async (req: Request): Promise<string> => {
   // Set function name for logs

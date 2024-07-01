@@ -17,3 +17,12 @@ export interface Params {
   body: any;
   params: any;
 }
+
+export interface Log {
+  label: string;
+  level: string;
+  message: {
+    executionId: string;
+  };
+  timestamp: string;
+}
