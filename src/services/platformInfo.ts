@@ -11,6 +11,35 @@ import Logger from '../tools/logger';
 // Services
 import SqlService from './sql';
 
+export const getAllPlatformInfos = async (
+  req: Request,
+  pool: Connection | null = null
+): Promise<PlatformInfoSQL[]> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'services/database.ts : getAllPlatformInfos ' + i;
+  Logger.info({ functionName: functionName(0) }, req);
+
+  let sql;
+
+  // Get platforms infos
+  sql = `
+    SELECT *
+    FROM platform_info
+    WHERE
+      platform_info.valid = 1
+    ;
+  `;
+  const lines: PlatformInfoSQL[] = await SqlService.sendSqlRequest(
+    req,
+    sql,
+    [],
+    pool
+  );
+
+  return lines;
+};
+
 export const getPlatformInfoFromName = async (
   req: Request,
   name: string,
@@ -28,14 +57,14 @@ export const getPlatformInfoFromName = async (
     SELECT *
     FROM platform_info
     WHERE
-      platform_info.name = "${name}"
+      platform_info.name = ?
     LIMIT 1
     ;
   `;
   const lines: PlatformInfoSQL[] = await SqlService.sendSqlRequest(
     req,
     sql,
-    [],
+    [name],
     pool
   );
 
@@ -43,5 +72,6 @@ export const getPlatformInfoFromName = async (
 };
 
 export default {
+  getAllPlatformInfos,
   getPlatformInfoFromName,
 };

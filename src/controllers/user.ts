@@ -28,6 +28,8 @@ import AppError from '../classes/AppError';
 import UserService from '../services/user';
 import SendMails from '../services/sendMails';
 import UserAssignmentService from '../services/userAssignment';
+import PlatformInfoService from '../services/platformInfo';
+import SqlService from '../services/sql';
 
 dayjs.extend(customParseFormat);
 
@@ -45,7 +47,9 @@ const getAll = async (req: Request): Promise<User[]> => {
   return result;
 };
 
-const getUserByIdOrEmail = async (req: Request): Promise<User> => {
+const getUserByIdOrEmail = async (
+  req: Request
+): Promise<User & { platformsAvailables: string[] }> => {
   // Set function name for logs
   const functionName = (i: number) =>
     'controller/user.ts : getUserByIdOrEmail ' + i;
@@ -55,9 +59,21 @@ const getUserByIdOrEmail = async (req: Request): Promise<User> => {
   if (typeof req.params.identifier !== 'string') {
     throw new AppError(CErrors.missingParameter);
   }
-  let result = await UserService.getUserFromIdSQL(req, req.params.identifier);
+
+  // Create pool connection
+  const pool = await SqlService.createPool(req);
+
+  let result = await UserService.getUserFromIdSQL(
+    req,
+    req.params.identifier,
+    pool
+  );
   if (!result?.id) {
-    result = await UserService.getUserFromEmailSQL(req, req.params.identifier);
+    result = await UserService.getUserFromEmailSQL(
+      req,
+      req.params.identifier,
+      pool
+    );
   }
 
   if (req?.user?.id !== result.id) {
@@ -72,19 +88,32 @@ const getUserByIdOrEmail = async (req: Request): Promise<User> => {
   delete result.salt;
   delete result.confirmation_code;
 
+  const platformInfos = await PlatformInfoService.getAllPlatformInfos(
+    req,
+    pool
+  );
+
   return {
     ...result,
     subs: result.subs ? (result.subs as string).split(',') : [],
+    platformsAvailables: platformInfos
+      .filter((e) => e.valid === 1)
+      .map((e) => e.name),
   };
 };
 
-const getMyUser = async (req: Request): Promise<User> => {
+const getMyUser = async (
+  req: Request
+): Promise<User & { platformsAvailables: string[] }> => {
   // Set function name for logs
   const functionName = (i: number) => 'controller/user.ts : getMyUser ' + i;
   Logger.info({ functionName: functionName(0) }, req);
 
+  // Create pool connection
+  const pool = await SqlService.createPool(req);
+
   // Get user
-  const result = await UserService.getUserFromIdSQL(req, req?.user?.id);
+  const result = await UserService.getUserFromIdSQL(req, req?.user?.id, pool);
 
   if (result.deleted_at) {
     throw new AppError(CErrors.userDeleted);
@@ -94,9 +123,17 @@ const getMyUser = async (req: Request): Promise<User> => {
   delete result.salt;
   delete result.confirmation_code;
 
+  const platformInfos = await PlatformInfoService.getAllPlatformInfos(
+    req,
+    pool
+  );
+
   return {
     ...result,
     subs: result.subs ? (result.subs as string).split(',') : [],
+    platformsAvailables: platformInfos
+      .filter((e) => e.valid === 1)
+      .map((e) => e.name),
   };
 };
 

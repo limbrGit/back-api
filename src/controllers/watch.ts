@@ -294,6 +294,37 @@ const startWatchContent = async (
   // };
 };
 
+const getPlatformAvailable = async (
+  req: Request,
+  iteration: number = 0
+): Promise<string[]> => {
+  // Set function name for logs
+  const functionName = (i: number) =>
+    'controller/list.ts : getPlatformAvailable ' + i;
+  Logger.info({ functionName: functionName(0), iteration: iteration }, req);
+
+  // Create pool connection
+  const pool = await SqlService.createPool(req);
+
+  // Check user
+  const user = await UserService.getUserFromIdSQL(req, req?.user?.id, pool);
+  if (!user) {
+    throw new AppError(CErrors.userNotFound);
+  }
+  if (user.deleted_at) {
+    throw new AppError(CErrors.userDeleted);
+  }
+
+  const platformInfos = await PlatformInfoService.getAllPlatformInfos(
+    req,
+    pool
+  );
+
+  // Return link
+  return platformInfos.filter((e) => e.valid === 1).map((e) => e.name);
+};
+
 export default {
   startWatchContent,
+  getPlatformAvailable,
 };

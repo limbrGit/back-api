@@ -74,11 +74,11 @@ export const getUserFromUsernameSQL = async (
       ${columnsGettable}
     FROM users
     WHERE
-      users.username = "${username}"
+      users.username = ?
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(req, sql, [username], pool);
 
   return result[0];
 };
@@ -97,11 +97,11 @@ export const getUserFromEmailSQL = async (
       ${columnsGettable}
     FROM users
     WHERE
-      users.email = "${email}"
+      users.email = ?
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(req, sql, [email], pool);
 
   return result[0];
 };
@@ -120,11 +120,11 @@ export const getUserFromIdSQL = async (
       ${columnsGettable}
     FROM users
     WHERE
-      users.id = "${id}"
+      users.id = ?
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(req, sql, [id], pool);
 
   return result[0];
 };
@@ -228,8 +228,12 @@ export const updateUserSQL = async (
           : ''
       }
       ${userSQL.subs ? "subs = '" + userSQL.subs + "'," : ''}
-      ${typeof userSQL.marketing === "string" ? "marketing = '" + userSQL.marketing + "'," : ''}
-      ${userSQL.marketing === null ? "marketing = NULL," : ''}
+      ${
+        typeof userSQL.marketing === 'string'
+          ? "marketing = '" + userSQL.marketing + "',"
+          : ''
+      }
+      ${userSQL.marketing === null ? 'marketing = NULL,' : ''}
       username = '${userSQL.username}'
     WHERE
       users.id = '${userSQL.id}'
@@ -351,11 +355,11 @@ export const getUserFromIdWithAdminSQL = async (
       ${columnsGettable}
     FROM users
     WHERE
-      users.id = "${id}"
+      users.id = ?
     LIMIT 1
     ;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(req, sql, [id], pool);
 
   return result[0];
 };

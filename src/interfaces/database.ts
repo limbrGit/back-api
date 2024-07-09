@@ -24,6 +24,8 @@ export interface PlatformInfoSQL {
   users_per_account: number;
   free_days: number;
   price: number | string;
+  month_before_end: number;
+  valid: number;
   created_at: number;
   updated_at: number;
   deleted_at: number | null;

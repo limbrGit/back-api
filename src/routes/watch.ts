@@ -14,6 +14,22 @@ import WatchController from '../controllers/watch';
 
 const watchApis = express.Router();
 
+// Get platforms available
+watchApis.get(
+  '/platform/available',
+  authenticateToken,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const functionName = 'GET on /watch/platform/available';
+    try {
+      Logger.info({ functionName: functionName }, req);
+      const result = await WatchController.getPlatformAvailable(req);
+      res.json(result);
+    } catch (error: any) {
+      next({ ...error, message: error.message, routeName: functionName });
+    }
+  })
+);
+
 // Get content link
 watchApis.get(
   '/:type/:id',

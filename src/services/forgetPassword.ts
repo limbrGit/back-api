@@ -30,10 +30,10 @@ export const getResetPasswordTokenFromTokenSQL = async (
   const sql = `
     SELECT *
     FROM users_reset_password
-    WHERE users_reset_password.token = "${token}"
+    WHERE users_reset_password.token = ?
     LIMIT 1;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(req, sql, [token], pool);
 
   return result[0];
 };
@@ -50,10 +50,10 @@ export const getResetPasswordTokenFromIdSQL = async (
   const sql = `
     SELECT *
     FROM users_reset_password
-    WHERE users_reset_password.id = "${id}"
+    WHERE users_reset_password.id = ?
     LIMIT 1;
   `;
-  const result = await SqlService.sendSqlRequest(req, sql, [], pool);
+  const result = await SqlService.sendSqlRequest(req, sql, [id], pool);
 
   return result[0];
 };
