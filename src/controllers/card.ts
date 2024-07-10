@@ -9,7 +9,7 @@ import Logger from '../tools/logger';
 
 // Constants
 import CErrors from '../constants/errors';
-import { PAYPAL, LYDIA } from '../constants/banks';
+import { PAYPAL, LYDIA, QONTO } from '../constants/banks';
 
 // Classes
 import AppError from '../classes/AppError';
@@ -40,7 +40,7 @@ const addCard = async (req: Request): Promise<Card> => {
   }
   if (
     name.length < 5 ||
-    ![PAYPAL, LYDIA].includes(bank) ||
+    ![PAYPAL, LYDIA, QONTO].includes(bank) ||
     number.length !== 16 ||
     month.length !== 2 ||
     year.length !== 2 ||
