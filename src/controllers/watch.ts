@@ -3,7 +3,7 @@ import { Request } from 'express';
 import dayjs from 'dayjs';
 
 // Interfaces
-import { Link } from '../interfaces/content';
+import { Link, Content, Episode } from '../interfaces/content';
 import { PlatformAccountSQL, PlatformInfoSQL } from '../interfaces/database';
 
 // Tools
@@ -25,6 +25,7 @@ import PlatformInfoService from '../services/platformInfo';
 import PlatformAccountService from '../services/platformAccount';
 import ContentService from '../services/content';
 import UserPlatformService from '../services/userPlatforms';
+import UserContentService from '../services/userContents';
 import SqlService from '../services/sql';
 
 const startWatchContent = async (
@@ -83,6 +84,16 @@ const startWatchContent = async (
     throw new AppError(CErrors.contentNotFound);
   }
   const element = Array.isArray(content) ? content[0] : content;
+
+  // Create the userContent
+  await UserContentService.createUserContentSQL(
+    req,
+    user,
+    type === 'content'
+      ? (element as Content).content_id
+      : (element as Episode).content_id,
+    type === 'content' ? null : (element as Episode).episode_id
+  );
 
   // Get the platforms infos
   let platformInfos: PlatformInfoSQL[] = [];

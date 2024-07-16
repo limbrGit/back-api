@@ -83,7 +83,8 @@ export interface EpisodeFile {
 }
 
 export interface EpisodeSQL {
-  episode_id: string;
+  content_id: number;
+  episode_id: number;
   saison: string;
   number?: number;
   title: Title;
@@ -99,7 +100,8 @@ export interface EpisodeSQL {
 }
 
 export interface Episode {
-  episode_id: string;
+  content_id: number;
+  episode_id: number;
   saison: string;
   number?: number;
   title: Title;

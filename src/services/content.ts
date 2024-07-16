@@ -87,7 +87,7 @@ const gettableCatalogLinks = [
 ];
 
 const gettableCatalogEpisodes = [
-  // 'content_id',
+  'content_id',
   'episode_id',
   'saison',
   'number',
