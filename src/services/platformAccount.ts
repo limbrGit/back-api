@@ -563,6 +563,7 @@ export const updatePlatformAccountsInCreation = async (
 export const getPlatformAccountConnexion = async (
   req: Request,
   platformAccount: PlatformAccountSQL,
+  reset: string | null = null,
   pool: Connection | null = null
 ): Promise<any> => {
   // Set function name for logs
@@ -572,7 +573,9 @@ export const getPlatformAccountConnexion = async (
 
   // Create account
   const response = await fetch(
-    `${config.limbr.accountApi}/${platformAccount.platform}/connexion?email=${platformAccount.email}`,
+    `${config.limbr.accountApi}/${platformAccount.platform}/connexion?email=${
+      platformAccount.email
+    }${reset === 'true' ? '&reset=true' : ''}`,
     {
       method: 'GET',
       headers: {

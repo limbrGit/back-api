@@ -57,6 +57,7 @@ export interface CipherKeys {
   paramount: string;
   ocs: string;
   crunchyroll: string;
+  hbo: string;
 }
 
 export interface Vivawallet {

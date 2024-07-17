@@ -35,6 +35,7 @@ const getUserPlatform = async (
   Logger.info({ functionName: functionName(0) }, req);
 
   const { platform }: { platform?: string } = req.params;
+  const { reset = null } = req.query;
 
   // Check param and token
   if (!platform) {
@@ -94,6 +95,7 @@ const getUserPlatform = async (
     await PlatformAccountService.getPlatformAccountConnexion(
       req,
       platformAccount,
+      reset as string | null,
       pool
     );
   Logger.info({ functionName: functionName(8) }, req);

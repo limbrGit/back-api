@@ -75,6 +75,7 @@ const config: Config = {
     paramount: process.env.CIPHER_PARAMOUNT!,
     ocs: process.env.CIPHER_OCS!,
     crunchyroll: process.env.CIPHER_CRUNCHYROLL!,
+    hbo: process.env.CIPHER_HBO!,
   },
 
   vivawallet: {
