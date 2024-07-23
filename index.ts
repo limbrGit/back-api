@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import asyncHandler from 'express-async-handler';
 import cors from 'cors';
 import { exec } from 'child_process';
+import helmet from 'helmet';
 
 // Config
 import config from './src/configs/config';
@@ -47,6 +48,18 @@ dotenv.config();
 // Setup CORS
 app.use(cors());
 
+// Setup Helmet
+app.use(
+  helmet({
+    xXssProtection: true, //TODO Ne fonctionne pas, normalement le header 'X-Xss-Protection' doit être à 1
+    xDnsPrefetchControl: { allow: true },
+  })
+);
+app.use((_req, res, next) => {
+  res.setHeader('X-XSS-Protection', '1');
+  next();
+});
+
 // Set body parser
 app.use(
   bodyParser.urlencoded({
@@ -80,21 +93,17 @@ app.get(
       exec('find /logs -name "*.log" -type f -mtime +10 -delete');
       const connectioDB = await TestConnectionDBService.textConnectionDB(req);
       if (connectioDB.valid) {
-        res
-          .status(200)
-          .send({
-            name: 'back-api',
-            status: 'Server is UP !',
-            db: 'Connected',
-          });
+        res.status(200).send({
+          name: 'back-api',
+          status: 'Server is UP !',
+          db: 'Connected',
+        });
       } else {
-        res
-          .status(503)
-          .send({
-            name: 'back-api',
-            status: 'Server is UP !',
-            db: 'Disconnected',
-          });
+        res.status(503).send({
+          name: 'back-api',
+          status: 'Server is UP !',
+          db: 'Disconnected',
+        });
       }
     } catch (error) {
       next(error);
