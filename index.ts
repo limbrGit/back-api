@@ -29,6 +29,7 @@ import supportRoutes from './src/routes/support';
 import cardRoutes from './src/routes/card';
 import notificationRoutes from './src/routes/notification';
 import adminRoutes from './src/routes/admin';
+import platformInfoRoutes from './src/routes/platformInfo';
 
 // Tools
 import Logger from './src/tools/logger';
@@ -83,6 +84,7 @@ app.use('/support', supportRoutes);
 app.use('/card', cardRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/admin', adminRoutes);
+app.use('/platformInfo', platformInfoRoutes);
 
 // Check Service
 app.get(

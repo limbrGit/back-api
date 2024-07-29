@@ -21,7 +21,7 @@ userPlatformApis.get(
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const functionName = 'GET on /userPlatform/:platform';
     try {
-      Logger.info({ functionName:functionName  }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserPlatformController.getUserPlatform(req);
       res.json(result);
     } catch (error: any) {
@@ -37,7 +37,7 @@ userPlatformApis.get(
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const functionName = 'GET on /userPlatform/:platform/otp';
     try {
-      Logger.info({ functionName:functionName  }, req);
+      Logger.info({ functionName: functionName }, req);
       const result = await UserPlatformController.getUserPlatformOtp(req);
       res.json(result);
     } catch (error: any) {
